@@ -198,13 +198,13 @@ Each task is marked with who owns it:
 
 ---
 
-### Phase 7: Backend Integration (Future)
+### Phase 7: Backend Integration
 
-- [ ] **[You]** Decide between Supabase and Airtable
-- [ ] **[You]** Create account and project; obtain API keys
-- [ ] **[Claude]** Add settings screen for entering backend credentials (stored in localStorage)
-- [ ] **[Claude]** Replace localStorage data layer with backend API calls
-- [ ] **[Claude]** Handle sync conflicts (if using multiple devices)
+- [x] **[You]** Decide between Supabase and Airtable → **Supabase**
+- [x] **[You]** Create account and project; obtain API keys
+- [x] **[Claude]** Add settings screen for entering backend credentials (stored in localStorage)
+- [x] **[Claude]** Replace localStorage data layer with backend API calls
+- [ ] **[Claude]** Handle sync conflicts (if using multiple devices) — N/A for single-user
 
 ---
 

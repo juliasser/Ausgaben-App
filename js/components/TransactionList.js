@@ -1,5 +1,4 @@
-import { computed, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
-import { getTransactions } from '../store.js'
+import { computed } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 import { CATEGORIES, TRANSFER_META } from '../config.js'
 import { getPots } from '../store.js'
 
@@ -15,18 +14,15 @@ function categoryMeta(id) {
 }
 
 export default {
+  props: {
+    transactions: { type: Array, default: () => [] },
+    loading:      { type: Boolean, default: false },
+  },
   emits: ['edit'],
 
-  setup(_, { emit }) {
-    const version = ref(0)
-
-    const txList = computed(() => {
-      version.value // tracked for manual refresh after delete
-      return getTransactions()
-    })
-
+  setup(props, { emit }) {
     const groupedList = computed(() => {
-      const sorted = [...txList.value].sort((a, b) => b.spending_date.localeCompare(a.spending_date))
+      const sorted = [...props.transactions].sort((a, b) => b.spending_date.localeCompare(a.spending_date))
       const map = new Map()
       for (const tx of sorted) {
         if (!map.has(tx.spending_date)) map.set(tx.spending_date, [])
@@ -41,18 +37,15 @@ export default {
     const pots = getPots()
     const potLabel = id => pots.find(p => p.id === id)?.label ?? id
 
-    function handleEdit(tx) {
-      emit('edit', tx)
-    }
-
-    return { txList, groupedList, dayTotal, potLabel, categoryMeta, headerDate, handleEdit }
+    return { groupedList, dayTotal, potLabel, categoryMeta, headerDate,
+      handleEdit: tx => emit('edit', tx) }
   },
 
   template: `
     <div class="transaction-list">
       <h1>Ausgaben</h1>
 
-      <div class="empty-state" v-if="txList.length === 0">
+      <div class="empty-state" v-if="!loading && transactions.length === 0">
         <p>Noch keine Einträge.</p>
       </div>
 

@@ -1,6 +1,7 @@
 import { ref, computed, watch } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 import { CATEGORIES } from '../config.js'
-import { getPots, saveTransaction, deleteTransaction } from '../store.js'
+import { getPots } from '../store.js'
+import { createTransaction, updateTransaction, deleteTransaction } from '../db.js'
 
 function today() {
   const d = new Date()
@@ -112,35 +113,55 @@ export default {
       return Object.keys(e).length === 0
     }
 
+    // ── Async state ───────────────────────────────────────
+    const saving    = ref(false)
+    const saveError = ref(null)
+
     // ── Save ──────────────────────────────────────────────
-    function save() {
+    async function save() {
       if (!validate()) return
-
-      saveTransaction({
-        id:               props.transaction?.id,
-        type:             type.value,
-        title:            type.value === 'transfer'
-                            ? `${potLabel(from_pot.value)} → ${potLabel(to_pot.value)}`
-                            : title.value.trim(),
-        amount:           parseFloat(amount.value),
-        spending_date:    spending_date.value,
-        consumption_from: showConsumption.value ? consumption_from.value : spending_date.value,
-        consumption_to:   showConsumption.value && consumption_to.value ? consumption_to.value : null,
-        from_pot:         from_pot.value,
-        to_pot:           type.value === 'transfer' ? to_pot.value : null,
-        category:         type.value === 'expense' ? category.value : null,
-        notes:            notes.value.trim(),
-      })
-
-      emit('saved')
+      saving.value    = true
+      saveError.value = null
+      try {
+        const data = {
+          type:             type.value,
+          title:            type.value === 'transfer'
+                              ? `${potLabel(from_pot.value)} → ${potLabel(to_pot.value)}`
+                              : title.value.trim(),
+          amount:           parseFloat(amount.value),
+          spending_date:    spending_date.value,
+          consumption_from: showConsumption.value ? consumption_from.value : spending_date.value,
+          consumption_to:   showConsumption.value && consumption_to.value ? consumption_to.value : null,
+          from_pot:         from_pot.value,
+          to_pot:           type.value === 'transfer' ? to_pot.value : null,
+          category:         type.value === 'expense' ? category.value : null,
+          notes:            notes.value.trim(),
+        }
+        if (props.transaction?.id) {
+          await updateTransaction(props.transaction.id, data)
+        } else {
+          await createTransaction(data)
+        }
+        emit('saved')
+      } catch (e) {
+        saveError.value = e.message
+      } finally {
+        saving.value = false
+      }
     }
 
     // ── Delete (edit mode only) ───────────────────────────
     const confirmingDelete = ref(false)
 
-    function doDelete() {
-      deleteTransaction(props.transaction.id)
-      emit('saved')
+    async function doDelete() {
+      saving.value = true
+      try {
+        await deleteTransaction(props.transaction.id)
+        emit('saved')
+      } catch (e) {
+        saveError.value = e.message
+        saving.value = false
+      }
     }
 
     return {
@@ -148,7 +169,7 @@ export default {
       type, title, amount, spending_date, from_pot, to_pot, category, notes,
       showConsumption, consumption_from, consumption_to, consumptionFromUserEdited,
       dayCount, dailyAmount,
-      errors, save,
+      errors, saving, saveError, save,
       confirmingDelete, doDelete,
     }
   },
@@ -265,7 +286,10 @@ export default {
       </div>
 
       <div class="save-wrapper">
-        <button class="save-btn" type="button" @click="save">Speichern</button>
+        <p class="save-error" v-if="saveError">{{ saveError }}</p>
+        <button class="save-btn" type="button" @click="save" :disabled="saving">
+          {{ saving ? 'Speichern…' : 'Speichern' }}
+        </button>
       </div>
 
       <template v-if="transaction">

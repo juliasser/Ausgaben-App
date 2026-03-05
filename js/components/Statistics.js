@@ -1,5 +1,4 @@
 import { computed, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
-import { getTransactions } from '../store.js'
 import { CATEGORIES } from '../config.js'
 
 // ── Date utilities ────────────────────────────────────────
@@ -37,7 +36,10 @@ const MONTH_FMT = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numer
 // ── Component ─────────────────────────────────────────────
 
 export default {
-  setup() {
+  props: {
+    transactions: { type: Array, default: () => [] },
+  },
+  setup(props) {
     const mode = ref('30days') // '30days' | 'month'
 
     const now = new Date()
@@ -60,7 +62,7 @@ export default {
     })
 
     // ── Transactions ──────────────────────────────────────
-    const allTransactions = computed(() => getTransactions())
+    const allTransactions = computed(() => props.transactions)
 
     // ── Consumption totals for the period ─────────────────
     // Each expense's amount is distributed across its consumption range.

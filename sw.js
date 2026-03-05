@@ -13,6 +13,8 @@ const APP_SHELL = [
   './js/components/AddTransaction.js',
   './js/components/TransactionList.js',
   './js/components/Statistics.js',
+  './js/components/Settings.js',
+  './js/db.js',
 ]
 
 // Pre-cache app shell on install
