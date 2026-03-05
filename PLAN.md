@@ -166,7 +166,7 @@ Each task is marked with who owns it:
 - [x] **[Claude]** Build transfer mode toggle (from_pot → to_pot)
 - [x] **[Claude]** Add `consumption_from` (default = spending_date) and optional `consumption_to` fields; show distribution indicator when range is set
 - [x] **[Claude]** Form validation (required fields, valid amounts)
-- [ ] **[You]** Review and give feedback on form UX
+- [x] **[You]** Review and give feedback on form UX
 
 ---
 
@@ -174,7 +174,7 @@ Each task is marked with who owns it:
 
 - [x] **[Claude]** Build transaction list sorted by spending_date
 - [x] **[Claude]** Add edit and delete actions per item
-- [ ] **[You]** Review list and give feedback on what information to show per row
+- [x] **[You]** Review list and give feedback on what information to show per row
 
 ---
 
@@ -185,15 +185,15 @@ Each task is marked with who owns it:
 - [x] **[Claude]** Implement daily distribution logic: spread amount evenly across `[consumption_from, consumption_to]` when `consumption_to` is set
 - [x] **[Claude]** Implement category breakdown with percentage bars
 - [x] **[Claude]** Implement month selector with prev/next navigation
-- [ ] **[You]** Review stats screen and request adjustments
+- [x] **[You]** Review stats screen and request adjustments
 
 ---
 
 ### Phase 6: PWA Polish
 
-- [ ] **[Claude]** Finalize `manifest.json` (name, colors, display mode)
-- [ ] **[Claude]** Implement service worker for offline support
-- [ ] **[You]** Provide app icon (or ask Claude to generate a placeholder SVG)
+- [x] **[Claude]** Finalize `manifest.json` (name, colors, display mode)
+- [x] **[Claude]** Implement service worker for offline support
+- [x] **[Claude]** Generate placeholder SVG icon
 - [ ] **[You]** Test "Add to Home Screen" on your phone
 
 ---
