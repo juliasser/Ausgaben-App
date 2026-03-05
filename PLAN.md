@@ -143,12 +143,12 @@ Each task is marked with who owns it:
 
 ### Phase 1: Foundation
 
-- [x] **[Claude]** Read transcript and create project plan ← *you are here*
-- [ ] **[Claude]** Create project folder structure
-- [ ] **[You]** Choose tech stack (Vanilla JS, Vue, or React) — see options above
-- [ ] **[You]** Decide on initial budget pots (names exactly as you want them in the app)
-- [ ] **[Claude]** Scaffold base app (HTML shell, manifest.json, service worker stub)
-- [ ] **[You]** Configure GitHub Pages in repo settings (Settings → Pages → branch: `main`, folder: `/` or `/docs`)
+- [x] **[Claude]** Read transcript and create project plan
+- [x] **[Claude]** Create project folder structure
+- [x] **[You]** Choose tech stack → **Vue 3 via CDN (no build step)**
+- [x] **[You]** Decide on initial budget pots → Bar, Karte, Splitwise, Paypal, Granada Karte
+- [x] **[Claude]** Scaffold base app (HTML shell, manifest.json, service worker stub)
+- [ ] **[You]** Configure GitHub Pages in repo settings (Settings → Pages → branch: `main`, folder: `/`)
 
 ---
 
@@ -218,8 +218,8 @@ Each task is marked with who owns it:
 
 ## Open Questions (answer before Phase 3)
 
-1. **Tech stack** — Vanilla JS, Vue (CDN), or React?
-2. **Budget pot names** — Exact names as you want them (e.g., "Bank", "Cash", "Splitwise")?
+1. ~~**Tech stack**~~ → Vue 3 via CDN
+2. ~~**Budget pot names**~~ → Bar, Karte, Splitwise, Paypal, Granada Karte
 3. **Currency** — Single currency (EUR) for now?
 4. **Consumption range UX** — When entering a transaction, should `consumption_from` always be shown (pre-filled with spending_date), or hidden by default and only revealed via an "advanced" toggle?
 5. **Statistics defaults** — What time range do you want to see first when opening the stats screen?
