@@ -6,25 +6,42 @@
 
 ## Project Overview
 
-A personal **Progressive Web App (PWA)** to track personal spendings, hosted on GitHub Pages. The app tracks money across multiple "pots" (cash, bank account, Splitwise, etc.) and distinguishes between the date something was *spent* and the date it was *consumed*.
+A personal **Progressive Web App (PWA)** to track personal spendings, hosted on GitHub Pages. The app tracks money across multiple "budget pots" (cash, bank account, Splitwise, etc.) and distinguishes between the date something was *spent* and the date it was *consumed*.
 
 ---
 
 ## Core Concepts
 
-### Pots
+### Budget Pots
 Named containers for money. Currently planned:
 - **Bank** — main bank account
 - **Cash** — physical cash (topped up via ATM withdrawals)
 - **Splitwise** — shared expenses tracked with girlfriend
 
-Pots can be expanded later.
+Budget pots can be expanded later.
 
 ### Transaction Types
 | Type | Description | Example |
 |------|-------------|---------|
-| `expense` | Money leaves a pot for a real purchase | Buying groceries |
-| `transfer` | Money moves between two pots | ATM withdrawal (Bank → Cash) |
+| `expense` | Money leaves a budget pot for a real purchase | Buying groceries |
+| `transfer` | Money moves between two budget pots | ATM withdrawal (Bank → Cash) |
+
+### Categories
+Applied to `expense` transactions (not transfers):
+
+| Category | German |
+|----------|--------|
+| Shopping | Einkauf |
+| Food & Dining | Essen |
+| Transport | Transport |
+| Health | Gesundheit |
+| Leisure | Freizeit |
+| Housing | Wohnen |
+| Purchases | Anschaffungen |
+| Going Out | Ausgehen |
+| Other | Sonstiges |
+
+> The UI will display category names in German.
 
 ### Spending Date vs. Consumption Date
 - **Spending date** — when the money actually left the account
@@ -44,9 +61,10 @@ Pots can be expanded later.
 | `amount` | number | yes | In EUR (or chosen currency) |
 | `spending_date` | date | yes | When money left the account |
 | `consumption_date` | date | no | When it's consumed; defaults to spending_date |
-| `from_pot` | string | yes | Source pot (Bank, Cash, Splitwise, …) |
-| `to_pot` | string | for transfers | Destination pot (for transfers only) |
+| `from_pot` | string | yes | Source budget pot (Bank, Cash, Splitwise, …) |
+| `to_pot` | string | for transfers | Destination budget pot (for transfers only) |
 | `type` | enum | yes | `expense` or `transfer` |
+| `category` | enum | for expenses | One of the 9 categories (see above); not used for transfers |
 | `notes` | string | no | Free-form notes |
 
 ---
@@ -57,11 +75,12 @@ Pots can be expanded later.
 - Form with all fields above
 - Toggle between `expense` and `transfer` mode (hides/shows relevant fields)
 - `consumption_date` defaults to `spending_date` but can be overridden
-- Inline pot selector (dropdown from configured pots)
+- Inline budget pot selector (dropdown from configured budget pots)
+- Category picker (only shown for expenses, German labels)
 
 ### 2. Transaction List
 - All transactions sorted by `spending_date` (descending)
-- Shows: date, title, amount, pot, type badge
+- Shows: date, title, amount, budget pot, category, type badge
 - Tap to edit or delete
 
 ### 3. Statistics
@@ -76,7 +95,7 @@ Two switchable views:
 - Annual/periodic fees are spread evenly across their consumption period
 - Shows a "true" daily cost of living
 
-Both views can filter by pot and date range.
+Both views can filter by budget pot, category, and date range.
 
 ---
 
@@ -123,7 +142,7 @@ Each task is marked with who owns it:
 - [x] **[Claude]** Read transcript and create project plan ← *you are here*
 - [ ] **[Claude]** Create project folder structure
 - [ ] **[You]** Choose tech stack (Vanilla JS, Vue, or React) — see options above
-- [ ] **[You]** Decide on initial pots (names exactly as you want them in the app)
+- [ ] **[You]** Decide on initial budget pots (names exactly as you want them in the app)
 - [ ] **[Claude]** Scaffold base app (HTML shell, manifest.json, service worker stub)
 - [ ] **[You]** Configure GitHub Pages in repo settings (Settings → Pages → branch: `main`, folder: `/` or `/docs`)
 
@@ -132,7 +151,7 @@ Each task is marked with who owns it:
 ### Phase 2: Data Layer
 
 - [ ] **[Claude]** Implement localStorage data layer (create, read, update, delete transactions)
-- [ ] **[Claude]** Implement pot configuration (stored in localStorage, editable)
+- [ ] **[Claude]** Implement budget pot configuration (stored in localStorage, editable)
 - [ ] **[You]** Review data model — confirm fields, names, and types are right for you
 
 ---
@@ -196,7 +215,7 @@ Each task is marked with who owns it:
 ## Open Questions (answer before Phase 3)
 
 1. **Tech stack** — Vanilla JS, Vue (CDN), or React?
-2. **Pot names** — Exact names as you want them (e.g., "Bank", "Cash", "Splitwise")?
+2. **Budget pot names** — Exact names as you want them (e.g., "Bank", "Cash", "Splitwise")?
 3. **Currency** — Single currency (EUR) for now?
 4. **Consumption date spread** — For a ticket bought today for a festival in 3 months, should the app ask for both dates explicitly, or derive the spread automatically?
 5. **Statistics defaults** — What time range do you want to see first when opening the stats screen?
