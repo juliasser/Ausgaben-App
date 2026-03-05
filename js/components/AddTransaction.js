@@ -190,7 +190,7 @@ export default {
 
       <!-- From pot -->
       <div class="form-group">
-        <label>{{ type === 'transfer' ? 'Von' : 'Budget-Topf' }}</label>
+        <label>{{ type === 'transfer' ? 'Von' : 'Zahlungsmittel' }}</label>
         <select v-model="from_pot" :class="{ 'has-error': errors.from_pot }">
           <option v-for="p in pots" :key="p.id" :value="p.id">{{ p.label }}</option>
         </select>
@@ -214,7 +214,7 @@ export default {
 
       <!-- Spending date -->
       <div class="form-group">
-        <label>Ausgabedatum</label>
+        <label>Datum</label>
         <input type="date" v-model="spending_date" :class="{ 'has-error': errors.spending_date }" />
         <span class="error" v-if="errors.spending_date">{{ errors.spending_date }}</span>
       </div>
