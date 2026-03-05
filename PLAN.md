@@ -6,228 +6,81 @@
 
 ## Project Overview
 
-A personal **Progressive Web App (PWA)** to track personal spendings, hosted on GitHub Pages. The app tracks money across multiple "budget pots" (cash, bank account, Splitwise, etc.) and distinguishes between the date something was *spent* and the date it was *consumed*.
+A personal **Progressive Web App (PWA)** to track personal spendings, hosted on GitHub Pages. Tracks money across multiple budget pots, distinguishes between spending date and consumption range, and syncs to Supabase.
+
+**Tech stack:** Vue 3 via CDN (no build step), Supabase REST API, GitHub Pages.
 
 ---
 
 ## Core Concepts
 
-### Budget Pots
-Named containers for money. Currently planned:
-- **Bank** — main bank account
-- **Cash** — physical cash (topped up via ATM withdrawals)
-- **Splitwise** — shared expenses tracked with girlfriend
-
-Budget pots can be expanded later.
-
-### Transaction Types
-| Type | Description | Example |
-|------|-------------|---------|
-| `expense` | Money leaves a budget pot for a real purchase | Buying groceries |
-| `transfer` | Money moves between two budget pots | ATM withdrawal (Bank → Cash) |
-
-### Categories
-Applied to `expense` transactions (not transfers):
-
-| Category | German |
-|----------|--------|
-| Shopping | Einkauf |
-| Food & Dining | Essen |
-| Transport | Transport |
-| Health | Gesundheit |
-| Leisure | Freizeit |
-| Housing | Wohnen |
-| Purchases | Anschaffungen |
-| Going Out | Ausgehen |
-| Other | Sonstiges |
-
-> The UI will display category names in German.
-
-### Spending Date vs. Consumption Range
-- **Spending date** — when the money actually left the account
-- **Consumption from** — start of the consumption period; defaults to `spending_date`
-- **Consumption to** — end of the consumption period; optional
-  - `null` → no distribution; the full amount counts on `consumption_from`
-  - set → distribution activated; the amount is spread evenly across every day in the range `[consumption_from, consumption_to]`
-- Example — festival ticket: spending_date = purchase date, consumption_from = festival start, consumption_to = festival end
-- Example — annual fee: consumption_from = Jan 1, consumption_to = Dec 31 → averaged to a daily cost
+- **Budget pots** — Bar, Karte, Splitwise, Paypal, Granada Karte
+- **Transaction types** — `expense` (money out) or `transfer` (between pots)
+- **Categories** (German, expenses only) — Einkauf, Essen, Transport, Gesundheit, Freizeit, Wohnen, Anschaffungen, Ausgehen, Sonstiges
+- **Spending date** — when money left the account
+- **Consumption range** — `consumption_from` (defaults to spending date) + optional `consumption_to`; if set, amount is spread evenly across the range in statistics
 
 ---
 
-## Fields per Transaction
+## Completed Phases
 
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| `id` | string | auto | Unique identifier |
-| `title` | string | yes | Name/description of the spending |
-| `amount` | number | yes | In EUR (or chosen currency) |
-| `spending_date` | date | yes | When money left the account |
-| `consumption_from` | date | no | Start of consumption period; defaults to `spending_date` |
-| `consumption_to` | date | no | End of consumption period; `null` = no distribution, set = spread amount evenly across range |
-| `from_pot` | string | yes | Source budget pot (Bank, Cash, Splitwise, …) |
-| `to_pot` | string | for transfers | Destination budget pot (for transfers only) |
-| `type` | enum | yes | `expense` or `transfer` |
-| `category` | enum | for expenses | One of the 9 categories (see above); not used for transfers |
-| `notes` | string | no | Free-form notes |
+| Phase | Summary |
+|-------|---------|
+| 1 — Foundation | Vue CDN scaffold, PWA shell, GitHub Pages |
+| 2 — Data layer | localStorage CRUD, pot config |
+| 3 — Add/Edit screen | Full form with validation, Erweitert accordion for consumption range + notes |
+| 4 — List screen | Grouped by date, tap to edit, category icons/colours |
+| 5 — Statistics | Rolling 30-day + month selector, consumption distribution, category breakdown |
+| 6 — PWA polish | manifest, service worker, placeholder icon |
+| 7 — Supabase backend | REST API wrapper, settings screen, global transactions ref in app.js |
 
 ---
 
-## Screens
+## Upcoming Phases
 
-### 1. Add / Edit Transaction
-- Form with all fields above
-- Toggle between `expense` and `transfer` mode (hides/shows relevant fields)
-- `consumption_from` defaults to `spending_date`; `consumption_to` is optional (enables distribution when set)
-- Inline budget pot selector (dropdown from configured budget pots)
-- Category picker (only shown for expenses, German labels)
+### Phase 8: Splitwise Integration
 
-### 2. Transaction List
-- All transactions sorted by `spending_date` (descending)
-- Shows: date, title, amount, budget pot, category, type badge
-- Tap to edit or delete
+**Problem:** Some shared expenses are logged in Splitwise by the other party. The user's share counts as personal consumption but no money ever left any pot — so it can't be recorded as a regular expense.
 
-### 3. Statistics
-Two switchable views:
+**Goal:** A way to log "virtual" expenses — costs that were consumed but not directly paid — so they show up correctly in statistics without distorting pot balances.
 
-**Spending view** — "What did I pay, and when?"
-- Daily/weekly/monthly totals by `spending_date`
-- Useful for cash flow
+**Open questions to resolve before implementation:**
+- [ ] **[You]** What should the entry flow look like? Options:
+  - A third transaction type `splitwise` alongside `expense` / `transfer`
+  - A checkbox/flag on regular expenses ("not paid from any pot")
+  - Always use the Splitwise pot but mark it as a "virtual" pot (no real balance)
+- [ ] **[You]** Should the amount entered be the full shared amount (app halves it) or the user's share already?
+- [ ] **[You]** Should these entries be visually distinct in the list?
 
-**Consumption view** — "What did I consume, and when?"
-- Daily/weekly/monthly totals based on consumption range
-- If `consumption_to` is null: full amount lands on `consumption_from`
-- If `consumption_to` is set: amount is spread evenly across `[consumption_from, consumption_to]`
-- Shows a "true" daily cost of living
-
-Both views can filter by budget pot, category, and date range.
+**Implementation tasks (once design is decided):**
+- [ ] **[Claude]** Update data model / transaction type if needed
+- [ ] **[Claude]** Update Add/Edit form to support the new flow
+- [ ] **[Claude]** Ensure statistics correctly include virtual expenses in consumption totals
+- [ ] **[Claude]** Ensure virtual expenses are visually distinguishable in the list
 
 ---
 
-## Tech Stack (to be decided)
+### Phase 9: Data Backup & Export
 
-Options to discuss before implementation starts:
-
-| Option | Pros | Cons |
-|--------|------|-------|
-| Vanilla JS + HTML/CSS | Zero dependencies, fast to prototype | More boilerplate |
-| Vue 3 (CDN, no build step) | Reactive UI, still simple | Slight learning curve |
-| React (Vite) | Ecosystem, components | Requires build step & deploy pipeline |
-
-**Recommended starting point:** Vanilla JS or Vue via CDN (no build step → simplest GitHub Pages deploy).
+- [ ] **[You]** Decide on backup format — options:
+  - **JSON download** — full fidelity, can be reimported later
+  - **CSV download** — easy to open in Excel/Numbers, no reimport
+  - Both
+- [ ] **[Claude]** Add export button (in settings screen) that downloads all transactions
+- [ ] **[Claude]** Optional: JSON import to restore from a backup
 
 ---
 
-## Data Storage
-
-### Phase 1 — Local Storage
-- All data stored in browser `localStorage`
-- No secrets, no backend, works offline
-- Good for prototyping and personal single-device use
-
-### Phase 2 — Backend (Future)
-Options: **Supabase** (preferred: open-source, free tier, real-time) or **Airtable**
-
-- API keys and config stored in `localStorage` (never in the repo)
-- App reads config from localStorage on startup
-- A settings screen will allow entering/updating keys
-
----
-
-## Phases & To-Dos
-
-Each task is marked with who owns it:
-- **[You]** — requires your decision, input, or action
-- **[Claude]** — can be implemented directly
-
----
-
-### Phase 1: Foundation
-
-- [x] **[Claude]** Read transcript and create project plan
-- [x] **[Claude]** Create project folder structure
-- [x] **[You]** Choose tech stack → **Vue 3 via CDN (no build step)**
-- [x] **[You]** Decide on initial budget pots → Bar, Karte, Splitwise, Paypal, Granada Karte
-- [x] **[Claude]** Scaffold base app (HTML shell, manifest.json, service worker stub)
-- [x] **[You]** Configure GitHub Pages in repo settings (Settings → Pages → branch: `main`, folder: `/`)
-
----
-
-### Phase 2: Data Layer
-
-- [x] **[Claude]** Implement localStorage data layer (create, read, update, delete transactions)
-- [x] **[Claude]** Implement budget pot configuration (stored in localStorage, editable)
-- [x] **[You]** Review data model — confirmed, fields and types are good as-is
-
----
-
-### Phase 3: Add / Edit Screen
-
-- [x] **[Claude]** Build "Add Transaction" form (expense mode)
-- [x] **[Claude]** Build transfer mode toggle (from_pot → to_pot)
-- [x] **[Claude]** Add `consumption_from` (default = spending_date) and optional `consumption_to` fields; show distribution indicator when range is set
-- [x] **[Claude]** Form validation (required fields, valid amounts)
-- [x] **[You]** Review and give feedback on form UX
-
----
-
-### Phase 4: List Screen
-
-- [x] **[Claude]** Build transaction list sorted by spending_date
-- [x] **[Claude]** Add edit and delete actions per item
-- [x] **[You]** Review list and give feedback on what information to show per row
-
----
-
-### Phase 5: Statistics Screen
-
-- [x] **[You]** Define what statistics matter most → rolling 30-day default, consumption view, month selector
-- [x] **[Claude]** Implement consumption view with period total and daily average
-- [x] **[Claude]** Implement daily distribution logic: spread amount evenly across `[consumption_from, consumption_to]` when `consumption_to` is set
-- [x] **[Claude]** Implement category breakdown with percentage bars
-- [x] **[Claude]** Implement month selector with prev/next navigation
-- [x] **[You]** Review stats screen and request adjustments
-
----
-
-### Phase 6: PWA Polish
-
-- [x] **[Claude]** Finalize `manifest.json` (name, colors, display mode)
-- [x] **[Claude]** Implement service worker for offline support
-- [x] **[Claude]** Generate placeholder SVG icon
-- [ ] **[You]** Test "Add to Home Screen" on your phone
-
----
-
-### Phase 7: Backend Integration
-
-- [x] **[You]** Decide between Supabase and Airtable → **Supabase**
-- [x] **[You]** Create account and project; obtain API keys
-- [x] **[Claude]** Add settings screen for entering backend credentials (stored in localStorage)
-- [x] **[Claude]** Replace localStorage data layer with backend API calls
-- [ ] **[Claude]** Handle sync conflicts (if using multiple devices) — N/A for single-user
-
----
-
-### Phase 8: Design & Polish (Future)
+### Phase 10: Design & Polish
 
 - [ ] **[You]** Define color palette and typography preferences
 - [ ] **[Claude]** Apply consistent design system
-- [ ] **[You]** Consider currency support (single vs. multi-currency)
-- [ ] **[You]** Consider data export (CSV, JSON)
-
----
-
-## Open Questions (answer before Phase 3)
-
-1. ~~**Tech stack**~~ → Vue 3 via CDN
-2. ~~**Budget pot names**~~ → Bar, Karte, Splitwise, Paypal, Granada Karte
-3. ~~**Currency**~~ → EUR only for now
-4. ~~**Consumption range UX**~~ → hidden behind an "Erweitert" toggle
-5. ~~**Statistics defaults**~~ → last 30 days, consumption view; rolling 30-day daily average; month selector
+- [ ] **[You]** Consider proper app icon (replace SVG placeholder)
 
 ---
 
 ## Notes
 
-- Repo will eventually be public → no secrets in code or config files
+- Repo is public — no secrets in code or config files ever
+- Supabase credentials live in localStorage only
 - The transcript that started this project is archived at `docs/Transcript.txt`
