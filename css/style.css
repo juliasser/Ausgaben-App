@@ -472,6 +472,33 @@ body {
   gap: 1.25rem;
 }
 
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.list-header h1 {
+  margin-bottom: 0;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  color: var(--color-muted);
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn:active {
+  background: var(--color-border);
+}
+
 .transaction-list h1 {
   font-size: 1.25rem;
   font-weight: 700;

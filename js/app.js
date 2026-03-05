@@ -73,6 +73,7 @@ const App = {
           :transactions="transactions"
           :loading="loading"
           @edit="startEdit"
+          @settings="currentScreen = 'settings'"
         />
         <Statistics
           v-else-if="currentScreen === 'stats'"
