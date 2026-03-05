@@ -1,4 +1,7 @@
+import { BUDGET_POTS } from './config.js'
+
 const STORAGE_KEY = 'ausgaben_transactions'
+const POTS_KEY    = 'ausgaben_pots'
 
 /**
  * Transaction shape:
@@ -43,4 +46,42 @@ export function saveTransaction(transaction) {
 export function deleteTransaction(id) {
   const transactions = getTransactions().filter(t => t.id !== id)
   localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions))
+}
+
+// ── Budget pot configuration ──────────────────────────────
+
+/** Returns the current pot list, falling back to the defaults in config.js */
+export function getPots() {
+  try {
+    return JSON.parse(localStorage.getItem(POTS_KEY)) || [...BUDGET_POTS]
+  } catch {
+    return [...BUDGET_POTS]
+  }
+}
+
+/** Persists a full pot list replacement */
+export function savePots(pots) {
+  localStorage.setItem(POTS_KEY, JSON.stringify(pots))
+}
+
+/** Add or update a single pot (matched by id) */
+export function savePot(pot) {
+  const pots = getPots()
+  const index = pots.findIndex(p => p.id === pot.id)
+  if (index >= 0) {
+    pots[index] = pot
+  } else {
+    pots.push(pot)
+  }
+  savePots(pots)
+}
+
+/** Remove a pot by id */
+export function deletePot(id) {
+  savePots(getPots().filter(p => p.id !== id))
+}
+
+/** Reset pots to the defaults from config.js */
+export function resetPots() {
+  localStorage.removeItem(POTS_KEY)
 }

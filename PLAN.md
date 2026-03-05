@@ -148,15 +148,15 @@ Each task is marked with who owns it:
 - [x] **[You]** Choose tech stack → **Vue 3 via CDN (no build step)**
 - [x] **[You]** Decide on initial budget pots → Bar, Karte, Splitwise, Paypal, Granada Karte
 - [x] **[Claude]** Scaffold base app (HTML shell, manifest.json, service worker stub)
-- [ ] **[You]** Configure GitHub Pages in repo settings (Settings → Pages → branch: `main`, folder: `/`)
+- [x] **[You]** Configure GitHub Pages in repo settings (Settings → Pages → branch: `main`, folder: `/`)
 
 ---
 
 ### Phase 2: Data Layer
 
-- [ ] **[Claude]** Implement localStorage data layer (create, read, update, delete transactions)
-- [ ] **[Claude]** Implement budget pot configuration (stored in localStorage, editable)
-- [ ] **[You]** Review data model — confirm fields, names, and types are right for you
+- [x] **[Claude]** Implement localStorage data layer (create, read, update, delete transactions)
+- [x] **[Claude]** Implement budget pot configuration (stored in localStorage, editable)
+- [x] **[You]** Review data model — confirmed, fields and types are good as-is
 
 ---
 

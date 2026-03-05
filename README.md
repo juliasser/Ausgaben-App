@@ -9,7 +9,12 @@ See [PLAN.md](PLAN.md) for the full project plan and to-do list.
 ```
 /
 ├── docs/            # Reference documents (transcript, notes)
-├── src/             # Source code (added during implementation)
+├── css/             # Styles
+├── js/              # Vue app, components, data layer
 ├── PLAN.md          # Project plan and phased to-do list
 └── README.md        # This file
 ```
+
+## Credits
+
+Built using the approach described by [Matt Webb](https://interconnected.org/home/2026/02/12/mist?utm_source=genmon&utm_medium=email&utm_campaign=interconnected-mist-share-and-edit-markdown-78b1) — using Claude as a collaborator to plan and build a personal app from a voice transcript.
