@@ -472,14 +472,16 @@ body {
   gap: 1.25rem;
 }
 
-.list-header {
+.list-header,
+.screen-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1rem;
 }
 
-.list-header h1 {
+.list-header h1,
+.screen-header h1 {
   margin-bottom: 0;
 }
 

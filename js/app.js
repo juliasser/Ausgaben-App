@@ -67,6 +67,7 @@ const App = {
           v-if="currentScreen === 'add'"
           :transaction="editingTransaction"
           @saved="onSaved"
+          @cancel="editingTransaction = null; currentScreen = 'list'"
         />
         <TransactionList
           v-else-if="currentScreen === 'list'"

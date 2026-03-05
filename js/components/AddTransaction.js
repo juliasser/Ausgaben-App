@@ -14,7 +14,7 @@ export default {
   props: {
     transaction: { type: Object, default: null },
   },
-  emits: ['saved'],
+  emits: ['saved', 'cancel'],
 
   setup(props, { emit }) {
     const pots = getPots()
@@ -176,7 +176,14 @@ export default {
 
   template: `
     <div class="add-transaction">
-      <h1>{{ transaction ? 'Bearbeiten' : 'Hinzufügen' }}</h1>
+      <div class="screen-header">
+        <h1>{{ transaction ? 'Bearbeiten' : 'Hinzufügen' }}</h1>
+        <button v-if="transaction" class="icon-btn" type="button" @click="$emit('cancel')" aria-label="Abbrechen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="22" height="22">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
 
       <!-- Type toggle -->
       <div class="type-toggle">
@@ -249,13 +256,7 @@ export default {
         <span class="error" v-if="errors.to_pot">{{ errors.to_pot }}</span>
       </div>
 
-      <!-- Notes -->
-      <div class="form-group">
-        <label>Notizen <span class="optional">(optional)</span></label>
-        <textarea v-model="notes" rows="2" placeholder="…"></textarea>
-      </div>
-
-      <!-- Consumption range (expense only) -->
+      <!-- Erweitert (expense only) -->
       <div class="consumption-section" v-if="type === 'expense'">
         <button class="toggle-btn" type="button" @click="showConsumption = !showConsumption">
           <span>Erweitert</span>
@@ -282,12 +283,22 @@ export default {
           <p class="hint" v-if="consumption_to && dayCount > 0">
             {{ dayCount }} Tage &rarr; {{ dailyAmount }}&thinsp;€/Tag
           </p>
+          <div class="form-group">
+            <label>Notizen <span class="optional">(optional)</span></label>
+            <textarea v-model="notes" rows="2" placeholder="…"></textarea>
+          </div>
         </div>
+      </div>
+
+      <!-- Notes (transfer only) -->
+      <div class="form-group" v-if="type === 'transfer'">
+        <label>Notizen <span class="optional">(optional)</span></label>
+        <textarea v-model="notes" rows="2" placeholder="…"></textarea>
       </div>
 
       <div class="save-wrapper">
         <p class="save-error" v-if="saveError">{{ saveError }}</p>
-        <button class="save-btn" type="button" @click="save" :disabled="saving">
+        <button class="save-btn" type="button" tabindex="0" @click="save" :disabled="saving">
           {{ saving ? 'Speichern…' : 'Speichern' }}
         </button>
       </div>
