@@ -1,6 +1,6 @@
 import { ref, computed, watch } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 import { CATEGORIES } from '../config.js'
-import { getPots, saveTransaction } from '../store.js'
+import { getPots, saveTransaction, deleteTransaction } from '../store.js'
 
 function today() {
   const d = new Date()
@@ -135,12 +135,21 @@ export default {
       emit('saved')
     }
 
+    // ── Delete (edit mode only) ───────────────────────────
+    const confirmingDelete = ref(false)
+
+    function doDelete() {
+      deleteTransaction(props.transaction.id)
+      emit('saved')
+    }
+
     return {
       pots, CATEGORIES,
       type, title, amount, spending_date, from_pot, to_pot, category, notes,
       showConsumption, consumption_from, consumption_to, consumptionFromUserEdited,
       dayCount, dailyAmount,
       errors, save,
+      confirmingDelete, doDelete,
     }
   },
 
@@ -258,6 +267,19 @@ export default {
       <div class="save-wrapper">
         <button class="save-btn" type="button" @click="save">Speichern</button>
       </div>
+
+      <template v-if="transaction">
+        <button v-if="!confirmingDelete" class="delete-btn" type="button" @click="confirmingDelete = true">
+          Löschen
+        </button>
+        <div v-else class="delete-confirm">
+          <span>Wirklich löschen?</span>
+          <div class="delete-confirm-actions">
+            <button type="button" @click="confirmingDelete = false">Abbrechen</button>
+            <button type="button" class="delete-confirm-yes" @click="doDelete">Ja, löschen</button>
+          </div>
+        </div>
+      </template>
     </div>
   `,
 }

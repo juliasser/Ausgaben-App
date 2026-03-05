@@ -172,9 +172,9 @@ Each task is marked with who owns it:
 
 ### Phase 4: List Screen
 
-- [ ] **[Claude]** Build transaction list sorted by spending_date
-- [ ] **[Claude]** Add edit and delete actions per item
-- [ ] **[You]** Decide what information to show per row (e.g., show consumption_date only if it differs?)
+- [x] **[Claude]** Build transaction list sorted by spending_date
+- [x] **[Claude]** Add edit and delete actions per item
+- [ ] **[You]** Review list and give feedback on what information to show per row
 
 ---
 
