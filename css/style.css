@@ -146,7 +146,7 @@ body {
 .form-group input,
 .form-group select,
 .form-group textarea {
-  padding: 0.75rem;
+  padding: 1rem;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius);
   background: var(--color-surface);
@@ -180,38 +180,43 @@ body {
   line-height: 1.5;
 }
 
-/* Amount field with € prefix */
-.amount-input {
+/* Amount — large display */
+.amount-large {
   display: flex;
-  align-items: center;
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface);
-  overflow: hidden;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  align-items: baseline;
+  gap: 0.25rem;
+  border-bottom: 2.5px solid var(--color-border);
+  padding: 0.5rem 0.25rem 0.625rem;
+  transition: border-color 0.15s;
 }
 
-.amount-input:focus-within {
+.amount-large:focus-within {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-bg);
 }
 
-.amount-input.has-error {
+.amount-large.has-error {
   border-color: #ef4444;
 }
 
-.amount-input .currency {
-  padding: 0 0.25rem 0 0.75rem;
+.amount-currency {
+  font-size: 2.25rem;
+  font-weight: 300;
   color: var(--color-muted);
-  font-size: 1rem;
-  pointer-events: none;
+  line-height: 1;
   user-select: none;
 }
 
-.amount-input input {
+.amount-large input {
   border: none !important;
   box-shadow: none !important;
-  padding-left: 0.25rem;
+  padding: 0 !important;
+  background: transparent;
+  font-size: 3.75rem !important;
+  font-weight: 700;
+  line-height: 1;
+  width: 100%;
+  min-width: 0;
+  color: var(--color-text);
 }
 
 /* Consumption range accordion */
@@ -280,6 +285,15 @@ body {
   letter-spacing: 0;
   font-size: 0.72rem;
   color: var(--color-muted);
+}
+
+/* Sticky save wrapper */
+.save-wrapper {
+  position: sticky;
+  bottom: 0;
+  padding-top: 1rem;
+  background: linear-gradient(to bottom, transparent, var(--color-bg) 40%);
+  margin-top: 0.25rem;
 }
 
 /* Save button */

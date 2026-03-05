@@ -154,18 +154,25 @@ export default {
         <button :class="{ active: type === 'transfer' }" @click="type = 'transfer'">Überweisung</button>
       </div>
 
-      <!-- Amount -->
+      <!-- Spending date -->
+      <div class="form-group">
+        <label>Datum</label>
+        <input type="date" v-model="spending_date" :class="{ 'has-error': errors.spending_date }" />
+        <span class="error" v-if="errors.spending_date">{{ errors.spending_date }}</span>
+      </div>
+
+      <!-- Amount (large display) -->
       <div class="form-group">
         <label>Betrag</label>
-        <div class="amount-input" :class="{ 'has-error': errors.amount }">
-          <span class="currency">€</span>
+        <div class="amount-large" :class="{ 'has-error': errors.amount }">
+          <span class="amount-currency">€</span>
           <input
             type="number"
             v-model="amount"
             inputmode="decimal"
             min="0"
             step="0.01"
-            placeholder="0.00"
+            placeholder="0"
           />
         </div>
         <span class="error" v-if="errors.amount">{{ errors.amount }}</span>
@@ -212,11 +219,10 @@ export default {
         <span class="error" v-if="errors.to_pot">{{ errors.to_pot }}</span>
       </div>
 
-      <!-- Spending date -->
+      <!-- Notes -->
       <div class="form-group">
-        <label>Datum</label>
-        <input type="date" v-model="spending_date" :class="{ 'has-error': errors.spending_date }" />
-        <span class="error" v-if="errors.spending_date">{{ errors.spending_date }}</span>
+        <label>Notizen <span class="optional">(optional)</span></label>
+        <textarea v-model="notes" rows="2" placeholder="…"></textarea>
       </div>
 
       <!-- Consumption range (expense only) -->
@@ -249,13 +255,9 @@ export default {
         </div>
       </div>
 
-      <!-- Notes -->
-      <div class="form-group">
-        <label>Notizen <span class="optional">(optional)</span></label>
-        <textarea v-model="notes" rows="2" placeholder="…"></textarea>
+      <div class="save-wrapper">
+        <button class="save-btn" type="button" @click="save">Speichern</button>
       </div>
-
-      <button class="save-btn" type="button" @click="save">Speichern</button>
     </div>
   `,
 }

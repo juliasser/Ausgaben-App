@@ -20,14 +20,6 @@
       navigator.serviceWorker.register('sw.js').catch(() => {})
     }
 
-    // iOS standalone PWA: keyboard doesn't appear on input tap unless we
-    // explicitly focus the element on touchend.
-    document.addEventListener('touchend', e => {
-      const el = e.target
-      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
-        el.focus()
-      }
-    }, { passive: true })
   </script>
   <script type="module" src="js/app.js"></script>
 </body>
