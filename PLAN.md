@@ -162,10 +162,10 @@ Each task is marked with who owns it:
 
 ### Phase 3: Add / Edit Screen
 
-- [ ] **[Claude]** Build "Add Transaction" form (expense mode)
-- [ ] **[Claude]** Build transfer mode toggle (from_pot → to_pot)
-- [ ] **[Claude]** Add `consumption_from` (default = spending_date) and optional `consumption_to` fields; show distribution indicator when range is set
-- [ ] **[Claude]** Form validation (required fields, valid amounts)
+- [x] **[Claude]** Build "Add Transaction" form (expense mode)
+- [x] **[Claude]** Build transfer mode toggle (from_pot → to_pot)
+- [x] **[Claude]** Add `consumption_from` (default = spending_date) and optional `consumption_to` fields; show distribution indicator when range is set
+- [x] **[Claude]** Form validation (required fields, valid amounts)
 - [ ] **[You]** Review and give feedback on form UX
 
 ---
