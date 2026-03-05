@@ -180,10 +180,11 @@ Each task is marked with who owns it:
 
 ### Phase 5: Statistics Screen
 
-- [ ] **[You]** Define what statistics matter most to you (e.g., weekly total? monthly by pot? rolling 30-day average?)
-- [ ] **[Claude]** Implement spending-date view with daily/weekly/monthly aggregation
-- [ ] **[Claude]** Implement consumption-date view
-- [ ] **[Claude]** Implement daily distribution logic: spread amount evenly across `[consumption_from, consumption_to]` when `consumption_to` is set
+- [x] **[You]** Define what statistics matter most → rolling 30-day default, consumption view, month selector
+- [x] **[Claude]** Implement consumption view with period total and daily average
+- [x] **[Claude]** Implement daily distribution logic: spread amount evenly across `[consumption_from, consumption_to]` when `consumption_to` is set
+- [x] **[Claude]** Implement category breakdown with percentage bars
+- [x] **[Claude]** Implement month selector with prev/next navigation
 - [ ] **[You]** Review stats screen and request adjustments
 
 ---
@@ -220,9 +221,9 @@ Each task is marked with who owns it:
 
 1. ~~**Tech stack**~~ → Vue 3 via CDN
 2. ~~**Budget pot names**~~ → Bar, Karte, Splitwise, Paypal, Granada Karte
-3. **Currency** — Single currency (EUR) for now?
-4. **Consumption range UX** — When entering a transaction, should `consumption_from` always be shown (pre-filled with spending_date), or hidden by default and only revealed via an "advanced" toggle?
-5. **Statistics defaults** — What time range do you want to see first when opening the stats screen?
+3. ~~**Currency**~~ → EUR only for now
+4. ~~**Consumption range UX**~~ → hidden behind an "Erweitert" toggle
+5. ~~**Statistics defaults**~~ → last 30 days, consumption view; rolling 30-day daily average; month selector
 
 ---
 

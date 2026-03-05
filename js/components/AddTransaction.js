@@ -237,7 +237,7 @@ export default {
       <!-- Consumption range (expense only) -->
       <div class="consumption-section" v-if="type === 'expense'">
         <button class="toggle-btn" type="button" @click="showConsumption = !showConsumption">
-          <span>Verbrauchszeitraum</span>
+          <span>Erweitert</span>
           <svg class="chevron" :class="{ open: showConsumption }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="6 9 12 15 18 9"/>
           </svg>

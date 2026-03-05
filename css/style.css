@@ -485,6 +485,150 @@ body {
   color: var(--color-text);
 }
 
+/* ── Statistics ──────────────────────────────────────────── */
+
+.statistics {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.statistics h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.statistics h2 {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Month navigator */
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.25rem 0.5rem;
+}
+
+.month-nav-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.month-nav-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: var(--color-text);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.month-nav-btn:disabled {
+  color: var(--color-border);
+  cursor: default;
+}
+
+.month-nav-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Summary cards */
+.stats-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.summary-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.summary-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summary-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+/* Category breakdown */
+.category-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stats-category-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stats-category-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.stats-category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.stats-category-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.stats-category-amount {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.bar-track {
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
 /* ── Screen placeholder (removed in later phases) ────────── */
 
 .screen-placeholder {
