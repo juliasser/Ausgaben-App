@@ -43,12 +43,14 @@ Applied to `expense` transactions (not transfers):
 
 > The UI will display category names in German.
 
-### Spending Date vs. Consumption Date
+### Spending Date vs. Consumption Range
 - **Spending date** — when the money actually left the account
-- **Consumption date** — when the purchase is actually "used"
-- For most day-to-day purchases these are the same date
-- For future events (e.g., festival tickets) they differ
-- Annual/periodic fees can be spread across their consumption period for daily averages
+- **Consumption from** — start of the consumption period; defaults to `spending_date`
+- **Consumption to** — end of the consumption period; optional
+  - `null` → no distribution; the full amount counts on `consumption_from`
+  - set → distribution activated; the amount is spread evenly across every day in the range `[consumption_from, consumption_to]`
+- Example — festival ticket: spending_date = purchase date, consumption_from = festival start, consumption_to = festival end
+- Example — annual fee: consumption_from = Jan 1, consumption_to = Dec 31 → averaged to a daily cost
 
 ---
 
@@ -60,7 +62,8 @@ Applied to `expense` transactions (not transfers):
 | `title` | string | yes | Name/description of the spending |
 | `amount` | number | yes | In EUR (or chosen currency) |
 | `spending_date` | date | yes | When money left the account |
-| `consumption_date` | date | no | When it's consumed; defaults to spending_date |
+| `consumption_from` | date | no | Start of consumption period; defaults to `spending_date` |
+| `consumption_to` | date | no | End of consumption period; `null` = no distribution, set = spread amount evenly across range |
 | `from_pot` | string | yes | Source budget pot (Bank, Cash, Splitwise, …) |
 | `to_pot` | string | for transfers | Destination budget pot (for transfers only) |
 | `type` | enum | yes | `expense` or `transfer` |
@@ -74,7 +77,7 @@ Applied to `expense` transactions (not transfers):
 ### 1. Add / Edit Transaction
 - Form with all fields above
 - Toggle between `expense` and `transfer` mode (hides/shows relevant fields)
-- `consumption_date` defaults to `spending_date` but can be overridden
+- `consumption_from` defaults to `spending_date`; `consumption_to` is optional (enables distribution when set)
 - Inline budget pot selector (dropdown from configured budget pots)
 - Category picker (only shown for expenses, German labels)
 
@@ -91,8 +94,9 @@ Two switchable views:
 - Useful for cash flow
 
 **Consumption view** — "What did I consume, and when?"
-- Daily/weekly/monthly totals by `consumption_date`
-- Annual/periodic fees are spread evenly across their consumption period
+- Daily/weekly/monthly totals based on consumption range
+- If `consumption_to` is null: full amount lands on `consumption_from`
+- If `consumption_to` is set: amount is spread evenly across `[consumption_from, consumption_to]`
 - Shows a "true" daily cost of living
 
 Both views can filter by budget pot, category, and date range.
@@ -160,7 +164,7 @@ Each task is marked with who owns it:
 
 - [ ] **[Claude]** Build "Add Transaction" form (expense mode)
 - [ ] **[Claude]** Build transfer mode toggle (from_pot → to_pot)
-- [ ] **[Claude]** Add consumption_date field with default = spending_date
+- [ ] **[Claude]** Add `consumption_from` (default = spending_date) and optional `consumption_to` fields; show distribution indicator when range is set
 - [ ] **[Claude]** Form validation (required fields, valid amounts)
 - [ ] **[You]** Review and give feedback on form UX
 
@@ -179,7 +183,7 @@ Each task is marked with who owns it:
 - [ ] **[You]** Define what statistics matter most to you (e.g., weekly total? monthly by pot? rolling 30-day average?)
 - [ ] **[Claude]** Implement spending-date view with daily/weekly/monthly aggregation
 - [ ] **[Claude]** Implement consumption-date view
-- [ ] **[Claude]** Implement daily average spread for periodic fees (consumption_date range)
+- [ ] **[Claude]** Implement daily distribution logic: spread amount evenly across `[consumption_from, consumption_to]` when `consumption_to` is set
 - [ ] **[You]** Review stats screen and request adjustments
 
 ---
@@ -217,7 +221,7 @@ Each task is marked with who owns it:
 1. **Tech stack** — Vanilla JS, Vue (CDN), or React?
 2. **Budget pot names** — Exact names as you want them (e.g., "Bank", "Cash", "Splitwise")?
 3. **Currency** — Single currency (EUR) for now?
-4. **Consumption date spread** — For a ticket bought today for a festival in 3 months, should the app ask for both dates explicitly, or derive the spread automatically?
+4. **Consumption range UX** — When entering a transaction, should `consumption_from` always be shown (pre-filled with spending_date), or hidden by default and only revealed via an "advanced" toggle?
 5. **Statistics defaults** — What time range do you want to see first when opening the stats screen?
 
 ---
