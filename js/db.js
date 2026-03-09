@@ -50,7 +50,11 @@ async function request(path, { method = 'GET', body, returnData = false } = {}) 
 
 // Supabase returns NUMERIC as string — normalise amounts to number
 function normalise(tx) {
-  return { ...tx, amount: parseFloat(tx.amount) }
+  return {
+    ...tx,
+    amount:           parseFloat(tx.amount),
+    secondary_amount: tx.secondary_amount != null ? parseFloat(tx.secondary_amount) : null,
+  }
 }
 
 // ── Transaction CRUD ──────────────────────────────────────

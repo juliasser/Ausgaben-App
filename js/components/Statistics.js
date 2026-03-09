@@ -81,8 +81,9 @@ export default {
         const overlap = overlapDays(from, to, start, end)
         if (overlap <= 0) continue
 
-        const txDays = spanDays(from, to)
-        const amount = (tx.amount / txDays) * overlap
+        const txDays   = spanDays(from, to)
+        const consumed = tx.amount - (tx.secondary_amount ?? 0)
+        const amount   = (consumed / txDays) * overlap
 
         total += amount
         const cat = tx.category || 'sonstiges'

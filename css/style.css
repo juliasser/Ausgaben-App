@@ -383,6 +383,65 @@ body {
   color: var(--color-muted);
 }
 
+/* Splitwise share row */
+.sw-share-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.sw-share-input {
+  display: flex;
+  align-items: center;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  min-width: 110px;
+}
+
+.sw-share-input:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.sw-share-input.has-error {
+  border-color: #ef4444;
+}
+
+.sw-share-input input {
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0.75rem 0.25rem 0.75rem 1rem !important;
+  background: transparent;
+  width: 72px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  text-align: right;
+}
+
+.sw-share-symbol {
+  padding: 0 0.875rem 0 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  user-select: none;
+}
+
+.sw-share-calc {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+.sw-share-mine {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
 /* Sticky save wrapper */
 .save-wrapper {
   position: sticky;
