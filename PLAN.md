@@ -4,15 +4,15 @@
 
 | Phase | Summary |
 |-------|---------|
-| 1 | Vue CDN scaffold, PWA shell, GitHub Pages |
-| 2 | localStorage CRUD, pot config |
-| 3 | Add/Edit form with validation, Erweitert accordion |
-| 4 | Transaction list grouped by date, tap to edit |
-| 5 | Statistics: 30-day + month, consumption distribution, category bars |
-| 6 | PWA polish: manifest, service worker, icon |
-| 7 | Supabase backend: REST wrapper, settings screen |
-| 8 | Split payments: secondary_pot/secondary_amount, Splitwise tab, statistics use consumed amount |
-| 9 | localStorage backup after every fetch; CSV + JSON export in settings |
+| [1](CHANGELOG.md#phase-1) | Vue CDN scaffold, PWA shell, GitHub Pages |
+| [2](CHANGELOG.md#phase-2) | localStorage CRUD, pot config |
+| [3](CHANGELOG.md#phase-3) | Add/Edit form with validation, Erweitert accordion |
+| [4](CHANGELOG.md#phase-4) | Transaction list grouped by date, tap to edit |
+| [5](CHANGELOG.md#phase-5) | Statistics: 30-day + month, consumption distribution, category bars |
+| [6](CHANGELOG.md#phase-6) | PWA polish: manifest, service worker, icon |
+| [7](CHANGELOG.md#phase-7) | Supabase backend: REST wrapper, settings screen |
+| [8](CHANGELOG.md#phase-8) | Split payments: secondary_pot/secondary_amount, Splitwise tab, statistics use consumed amount |
+| [9](CHANGELOG.md#phase-9) | localStorage backup after every fetch; CSV + JSON export in settings |
 
 ---
 
