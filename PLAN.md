@@ -40,67 +40,55 @@ A personal **Progressive Web App (PWA)** to track personal spendings, hosted on 
 
 ### Phase 8: Split Payments & Splitwise
 
-#### Concept: Secondary Pot
+#### Concept
 
-The core idea is a **secondary pot** — any expense can optionally be funded from two pots at once. This covers two distinct use cases:
+Each transaction has a `from_pot` (source) and a destination. The destination is always split between:
+- **null** — the consumed/spent portion (shows up in statistics)
+- **`secondary_pot`** — an optional second pot that receives the remainder (e.g. Splitwise balance)
 
-**Use case 1 — Split payment across two real pots**
-> Buy something for 6€, pay 4€ from Cash and 2€ from Card.
-> Both pots are debited, total expense is 6€.
-
-**Use case 2 — Shared expense via Splitwise**
-> Buy something for 6€ shared 50/50. Splitwise is a pot that tracks the running balance of what is owed/owing.
+All "null" amounts across all transactions = total consumption.
 
 ---
 
 #### Data model addition
 
-Two new optional fields on every transaction:
+Two new optional fields on expense transactions:
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `secondary_pot` | string \| null | ID of the second pot |
-| `secondary_amount` | number \| null | Amount attributed to secondary pot; can be negative |
+| `secondary_pot` | string \| null | Destination pot for the non-consumed portion |
+| `secondary_amount` | number \| null | Amount going into `secondary_pot` |
 
-`amount` stays as the **total** transaction amount (what shows in stats as consumption).
-The primary pot is debited: `amount − secondary_amount`.
-The secondary pot is debited/credited: `secondary_amount`.
+**Consumption in statistics** = `amount − (secondary_amount ?? 0)`
+
+The Splitwise pot balance = sum of all `secondary_amount` values pointing to it.
+Positive balance = owed to me. Negative balance = I owe.
 
 ---
 
 #### Concrete examples
 
-**A — Split payment (4€ Cash + 2€ Card = 6€ total)**
+**B — I paid the full 6€, split 50/50**
 ```
 type:             expense
-amount:           6        ← total, used in statistics
-from_pot:         cash     ← debited: 6 − 2 = 4€
-secondary_pot:    card
-secondary_amount: 2        ← card debited 2€
-```
-
-**B — Splitwise: I paid the full 6€, split 50/50**
-```
-type:             expense
-amount:           3        ← my share = my consumption
-from_pot:         cash     ← debited: 3 − (−3) = 6€ (I paid all)
+from_pot:         cash          ← 6€ leaves cash
+amount:           6
 secondary_pot:    splitwise
-secondary_amount: −3       ← Splitwise credited +3 (they owe me)
+secondary_amount: 3             ← 3€ goes to Splitwise (they owe me)
+                                ← null (consumed) = 6 − 3 = 3€
 notes:            "Total: 6€"
 ```
 
-**C — Splitwise: other party paid the full 6€, split 50/50**
+**C — Other party paid the full 6€, split 50/50**
 ```
 type:             expense
-amount:           3        ← my share = my consumption
-from_pot:         (none / null)  ← I paid 0 from any real pot
-secondary_pot:    splitwise
-secondary_amount: −3       ← Splitwise debited −3 (I owe them)
+from_pot:         splitwise     ← 3€ debited from Splitwise (I owe them)
+amount:           3
+                                ← null (consumed) = 3 − 0 = 3€
 notes:            "Total: 6€"
 ```
 
-The Splitwise pot balance = sum of all secondary_amounts toward it.
-Positive = net owed to me. Negative = net I owe.
+Case C is just a regular expense where the Splitwise pot is the source — no secondary fields needed. Case B is the only one that requires the new fields.
 
 ---
 
@@ -115,22 +103,16 @@ A third tab alongside Ausgabe / Überweisung. Fields:
 5. **Kategorie, Datum, Verbrauchszeitraum** — same as regular expense
 6. Full amount auto-written to notes as reference
 
-App computes and stores the correct `amount`, `from_pot`, `secondary_pot: 'splitwise'`, `secondary_amount` based on the above.
+App computes and stores the fields automatically from the above inputs.
 
 ---
 
-#### Open questions before implementation
-
-- [ ] **[You]** Confirm the sign convention in examples B/C above reads correctly to you
-- [ ] **[You]** Should "Andere Person" cases require selecting a pot at all, or is `from_pot: null` fine?
-- [ ] **[You]** Should split payments (use case 1) be accessible from the regular Ausgabe tab (as an optional field), or only from the Splitwise tab?
-
-#### Implementation tasks (once questions resolved)
+#### Implementation tasks
 
 - [ ] **[Claude]** Update Supabase schema — add `secondary_pot`, `secondary_amount` columns
 - [ ] **[Claude]** Add Splitwise tab to Add/Edit form
-- [ ] **[Claude]** Update list to show Splitwise entries distinctly (no pot label or "Splitwise" badge)
-- [ ] **[Claude]** Ensure statistics use `amount` (my share) for consumption totals
+- [ ] **[Claude]** Update statistics to use `amount − (secondary_amount ?? 0)` as consumption
+
 - [ ] **[You]** (Later) Splitwise API OAuth sync as a pre-fill helper — data model is already compatible
 
 ---
