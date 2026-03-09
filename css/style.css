@@ -560,6 +560,15 @@ body {
   background: var(--color-border);
 }
 
+.icon-btn--active {
+  color: var(--color-primary);
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .transaction-list h1 {
   font-size: 1.25rem;
   font-weight: 700;
@@ -570,6 +579,93 @@ body {
   color: var(--color-muted);
   padding: 3rem 0;
   font-size: 0.95rem;
+}
+
+/* ── List filters ────────────────────────────────────────── */
+
+.filter-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.25rem 0 0.25rem;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter-chip {
+  padding: 0.4rem 0.875rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.filter-chip.active {
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.filter-dates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.filter-date-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.filter-date-group label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filter-date-input {
+  padding: 0.625rem 0.75rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  font-family: inherit;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.filter-date-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.filter-sum {
+  font-size: 0.82rem;
+  color: var(--color-muted);
+  font-weight: 500;
+  padding: 0.25rem 0.25rem;
+}
+
+.filter-sum-amount {
+  font-weight: 700;
+  color: var(--color-text);
 }
 
 /* Date group */
