@@ -33,7 +33,48 @@ export default {
       emit('saved')
     }
 
-    return { url, key, testing, testStatus, testMsg, test, save }
+    // ── Export ────────────────────────────────────────────
+    const hasBackup = !!localStorage.getItem('ausgaben_backup')
+
+    function downloadJSON() {
+      const raw = localStorage.getItem('ausgaben_backup')
+      if (!raw) return
+      const blob = new Blob([raw], { type: 'application/json' })
+      const a    = document.createElement('a')
+      a.href     = URL.createObjectURL(blob)
+      a.download = `ausgaben-${new Date().toISOString().slice(0, 10)}.json`
+      a.click()
+      URL.revokeObjectURL(a.href)
+    }
+
+    function downloadCSV() {
+      const raw = localStorage.getItem('ausgaben_backup')
+      if (!raw) return
+      const txs     = JSON.parse(raw)
+      const headers = ['id', 'type', 'title', 'amount', 'spending_date',
+                       'consumption_from', 'consumption_to', 'from_pot', 'to_pot',
+                       'category', 'notes', 'secondary_pot', 'secondary_amount']
+      const esc = v => {
+        if (v == null) return ''
+        const s = String(v)
+        return (s.includes(';') || s.includes('"') || s.includes('\n'))
+          ? '"' + s.replace(/"/g, '""') + '"'
+          : s
+      }
+      const lines = [
+        headers.join(';'),
+        ...txs.map(tx => headers.map(h => esc(tx[h])).join(';')),
+      ]
+      // UTF-8 BOM for Excel on Windows
+      const blob = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' })
+      const a    = document.createElement('a')
+      a.href     = URL.createObjectURL(blob)
+      a.download = `ausgaben-${new Date().toISOString().slice(0, 10)}.csv`
+      a.click()
+      URL.revokeObjectURL(a.href)
+    }
+
+    return { url, key, testing, testStatus, testMsg, test, save, hasBackup, downloadCSV, downloadJSON }
   },
 
   template: `
@@ -76,6 +117,17 @@ export default {
           <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           <span>{{ testMsg }}</span>
         </div>
+      </div>
+
+      <div class="settings-section">
+        <h2>Exportieren</h2>
+        <p v-if="!hasBackup" style="font-size:0.875rem; color:var(--color-muted);">
+          Noch keine lokalen Daten. Öffne zuerst die Transaktionsliste.
+        </p>
+        <template v-else>
+          <button class="test-btn" type="button" @click="downloadCSV">CSV herunterladen</button>
+          <button class="test-btn" type="button" @click="downloadJSON">JSON herunterladen</button>
+        </template>
       </div>
 
       <div class="save-wrapper">

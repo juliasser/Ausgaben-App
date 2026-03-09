@@ -22,6 +22,7 @@ const App = {
       loadError.value = null
       try {
         transactions.value = await fetchTransactions()
+        localStorage.setItem('ausgaben_backup', JSON.stringify(transactions.value))
       } catch (e) {
         loadError.value = e.message
       } finally {
