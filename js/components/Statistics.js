@@ -1,5 +1,5 @@
 import { computed, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
-import { CATEGORIES } from '../config.js'
+import { CATEGORIES, BUDGET_POTS } from '../config.js'
 
 // ── Date utilities ────────────────────────────────────────
 
@@ -124,11 +124,27 @@ export default {
       return !(selectedYear.value === n.getFullYear() && selectedMonth.value === n.getMonth() + 1)
     })
 
+    // ── Pot balances (all-time) ────────────────────────────
+    const potBalances = computed(() => {
+      const bal = Object.fromEntries(BUDGET_POTS.map(p => [p.id, 0]))
+      for (const tx of allTransactions.value) {
+        if (tx.type === 'expense') {
+          bal[tx.from_pot] -= tx.amount
+          if (tx.secondary_pot != null && tx.secondary_amount != null)
+            bal[tx.secondary_pot] += tx.secondary_amount
+        } else if (tx.type === 'transfer') {
+          bal[tx.from_pot] -= tx.amount
+          if (tx.to_pot) bal[tx.to_pot] += tx.amount
+        }
+      }
+      return BUDGET_POTS.map(p => ({ ...p, balance: bal[p.id] }))
+    })
+
     const fmt = n => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
     return {
       mode, monthLabel, canGoNext, prevMonth, nextMonth,
-      totalAmount, dailyAverage, categoryRows, fmt,
+      totalAmount, dailyAverage, categoryRows, potBalances, fmt,
     }
   },
 
@@ -190,6 +206,17 @@ export default {
 
       <div class="empty-state" v-else>
         <p>Keine Ausgaben in diesem Zeitraum.</p>
+      </div>
+
+      <!-- Pot balances -->
+      <div class="pot-balances">
+        <h2>Salden</h2>
+        <div class="pot-balance-row" v-for="p in potBalances" :key="p.id">
+          <span class="pot-balance-name">{{ p.label }}</span>
+          <span class="pot-balance-amount" :class="p.balance > 0 ? 'pot-balance--pos' : p.balance === 0 ? 'pot-balance--zero' : ''">
+            {{ p.balance > 0 ? '+' : '' }}{{ fmt(p.balance) }}&thinsp;€
+          </span>
+        </div>
       </div>
     </div>
   `,

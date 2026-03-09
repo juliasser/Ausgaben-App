@@ -909,6 +909,37 @@ body {
   transition: width 0.4s ease;
 }
 
+/* ── Pot balances ────────────────────────────────────────── */
+
+.pot-balances {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pot-balance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.pot-balance-name {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.pot-balance-amount {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.pot-balance--pos  { color: #10b981; }
+.pot-balance--zero { color: var(--color-muted); }
+
 /* ── Screen placeholder (removed in later phases) ────────── */
 
 .screen-placeholder {
