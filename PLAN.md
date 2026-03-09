@@ -44,19 +44,23 @@ A personal **Progressive Web App (PWA)** to track personal spendings, hosted on 
 
 **Goal:** A way to log "virtual" expenses — costs that were consumed but not directly paid — so they show up correctly in statistics without distorting pot balances.
 
-**Open questions to resolve before implementation:**
-- [ ] **[You]** What should the entry flow look like? Options:
-  - A third transaction type `splitwise` alongside `expense` / `transfer`
-  - A checkbox/flag on regular expenses ("not paid from any pot")
-  - Always use the Splitwise pot but mark it as a "virtual" pot (no real balance)
-- [ ] **[You]** Should the amount entered be the full shared amount (app halves it) or the user's share already?
-- [ ] **[You]** Should these entries be visually distinct in the list?
+**Chosen approach: Hybrid (manual-first, API later)**
 
-**Implementation tasks (once design is decided):**
-- [ ] **[Claude]** Update data model / transaction type if needed
-- [ ] **[Claude]** Update Add/Edit form to support the new flow
-- [ ] **[Claude]** Ensure statistics correctly include virtual expenses in consumption totals
-- [ ] **[Claude]** Ensure virtual expenses are visually distinguishable in the list
+- Add `type: 'splitwise'` as a third transaction type (alongside `expense` and `transfer`)
+- No `from_pot` — these are virtual expenses, no money left any pot
+- Amount entered = user's share (not the full shared amount)
+- Treated as consumption in statistics (same as `expense`)
+- Visually distinct in the list
+- Supabase `CHECK` constraint on `type` needs updating to allow `'splitwise'`
+- Enrichment (category, `consumption_from`/`consumption_to`, notes) works the same as regular expenses
+- **Later (Phase 8b):** optional Splitwise API sync via OAuth to pre-fill entries; user reviews and confirms before they land in Supabase — data model is identical so nothing breaks
+
+**Implementation tasks:**
+- [ ] **[Claude]** Update Supabase `type` CHECK constraint to allow `'splitwise'`
+- [ ] **[Claude]** Add Splitwise type to the Add/Edit form toggle
+- [ ] **[Claude]** Update list to show Splitwise entries with a distinct icon/label, no pot
+- [ ] **[Claude]** Ensure statistics count Splitwise entries in consumption totals
+- [ ] **[You]** (Later) Set up Splitwise OAuth for API sync
 
 ---
 
