@@ -56,6 +56,7 @@
 ## Working style
 
 - **Ask before assuming** — when a feature request is ambiguous (e.g. a term like "Einkauf" could refer to a category or a pot), ask for clarification rather than guessing.
+- **Changelog emoji convention** — use 🐛 for bug fixes and 🦋 for new features in `CHANGELOG.md`.
 
 ## Conventions
 
