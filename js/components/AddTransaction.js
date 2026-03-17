@@ -72,9 +72,15 @@ export default {
     })
 
     // When switching to Splitwise, ensure from_pot is not 'splitwise'
+    // and default category to 'einkauf' for new transactions
     watch(uiType, newType => {
-      if (newType === 'splitwise' && from_pot.value === 'splitwise') {
-        from_pot.value = nonSplitwisePots.value[0]?.id || ''
+      if (newType === 'splitwise') {
+        if (from_pot.value === 'splitwise') {
+          from_pot.value = nonSplitwisePots.value[0]?.id || ''
+        }
+        if (!props.transaction && !category.value) {
+          category.value = 'einkauf'
+        }
       }
     })
 
@@ -136,6 +142,18 @@ export default {
     }
 
     const fmt2 = n => (isNaN(n) || n <= 0) ? '0,00' : n.toFixed(2).replace('.', ',')
+
+    // ── This-month shortcut ───────────────────────────────
+    function setThisMonth() {
+      const now = new Date()
+      const y = now.getFullYear()
+      const m = now.getMonth() + 1
+      const lastDay = new Date(y, m, 0).getDate()
+      consumption_from.value          = `${y}-${String(m).padStart(2, '0')}-01`
+      consumption_to.value            = `${y}-${String(m).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
+      consumptionFromUserEdited.value = true
+      showConsumption.value           = true
+    }
 
     // ── Validation ────────────────────────────────────────
     const errors = ref({})
@@ -285,7 +303,7 @@ export default {
       showConsumption, consumption_from, consumption_to, consumptionFromUserEdited,
       dayCount, dailyAmount,
       swTotalAmount, swPaidBy, swMyShareEur, swTheirShareAmount,
-      errors, saving, saveError, save, fmt2,
+      errors, saving, saveError, save, fmt2, setThisMonth,
       confirmingDelete, doDelete,
     }
   },
@@ -399,6 +417,7 @@ export default {
                 <input type="date" v-model="consumption_to" :class="{ 'has-error': errors.consumption_to }" />
               </div>
             </div>
+            <button class="this-month-btn" type="button" @click="setThisMonth">Dieser Monat</button>
             <span class="error" v-if="errors.consumption_to">{{ errors.consumption_to }}</span>
             <p class="hint" v-if="consumption_to && dayCount > 0">
               {{ dayCount }} Tage &rarr; {{ dailyAmount }}&thinsp;€/Tag
@@ -526,6 +545,7 @@ export default {
                 <input type="date" v-model="consumption_to" :class="{ 'has-error': errors.consumption_to }" />
               </div>
             </div>
+            <button class="this-month-btn" type="button" @click="setThisMonth">Dieser Monat</button>
             <span class="error" v-if="errors.consumption_to">{{ errors.consumption_to }}</span>
             <p class="hint" v-if="consumption_to && dayCount > 0">
               {{ dayCount }} Tage &rarr; {{ dailyAmount }}&thinsp;€/Tag (mein Anteil)

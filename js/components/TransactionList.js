@@ -25,9 +25,10 @@ export default {
     const potLabel = id => pots.find(p => p.id === id)?.label ?? id
 
     // ── Filters ───────────────────────────────────────────
-    const activePot = ref(null)   // pot id | null
-    const dateFrom  = ref('')
-    const dateTo    = ref('')
+    const activePot       = ref(null)   // pot id | null
+    const dateFrom        = ref('')
+    const dateTo          = ref('')
+    const showDistributed = ref(false)
 
     const visible = computed(() =>
       props.transactions.filter(tx => {
@@ -37,11 +38,12 @@ export default {
         }
         if (dateFrom.value && tx.spending_date < dateFrom.value) return false
         if (dateTo.value   && tx.spending_date > dateTo.value)   return false
+        if (showDistributed.value && !tx.consumption_to) return false
         return true
       })
     )
 
-    const anyFilter = computed(() => activePot.value || dateFrom.value || dateTo.value)
+    const anyFilter = computed(() => activePot.value || dateFrom.value || dateTo.value || showDistributed.value)
 
     // Sum of consumed expenses in the visible set
     const filteredSum = computed(() =>
@@ -79,7 +81,7 @@ export default {
 
     return {
       pots, groupedList, dayTotal, potLabel, categoryMeta, headerDate,
-      activePot, dateFrom, dateTo, anyFilter, filteredSum, visible, fmt,
+      activePot, dateFrom, dateTo, showDistributed, anyFilter, filteredSum, visible, fmt,
       showFilters, swEffect,
       handleEdit: tx => emit('edit', tx),
     }
@@ -114,6 +116,11 @@ export default {
             :class="{ active: activePot === p.id }"
             @click="activePot = activePot === p.id ? null : p.id"
           >{{ p.label }}</button>
+          <button
+            class="filter-chip"
+            :class="{ active: showDistributed }"
+            @click="showDistributed = !showDistributed"
+          >Verteilt</button>
         </div>
         <div class="filter-dates">
           <div class="filter-date-group">

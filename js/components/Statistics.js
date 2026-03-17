@@ -32,7 +32,13 @@ function overlapDays(aFrom, aTo, bFrom, bTo) {
   return start > end ? 0 : spanDays(start, end)
 }
 
-const MONTH_FMT = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' })
+const MONTH_FMT  = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' })
+const DATE_SHORT = new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'short' })
+
+function fmtDate(iso) {
+  const [y, m, d] = iso.split('-').map(Number)
+  return DATE_SHORT.format(new Date(y, m - 1, d))
+}
 
 // ── Component ─────────────────────────────────────────────
 
@@ -71,6 +77,7 @@ export default {
     const periodData = computed(() => {
       const { start, end } = dateRange.value
       const catTotals = {}
+      const catTxs    = {}
       let total = 0
 
       for (const tx of allTransactions.value) {
@@ -82,16 +89,22 @@ export default {
         const overlap = overlapDays(from, to, start, end)
         if (overlap <= 0) continue
 
-        const txDays   = spanDays(from, to)
-        const consumed = tx.amount - (tx.secondary_amount ?? 0)
-        const amount   = (consumed / txDays) * overlap
+        const txDays      = spanDays(from, to)
+        const consumed    = tx.amount - (tx.secondary_amount ?? 0)
+        const amount      = (consumed / txDays) * overlap
 
         total += amount
         const cat = tx.category || 'sonstiges'
         catTotals[cat] = (catTotals[cat] || 0) + amount
+        if (!catTxs[cat]) catTxs[cat] = []
+        catTxs[cat].push({ tx, periodAmount: amount })
       }
 
-      return { total, catTotals }
+      for (const cat in catTxs) {
+        catTxs[cat].sort((a, b) => b.tx.spending_date.localeCompare(a.tx.spending_date))
+      }
+
+      return { total, catTotals, catTxs }
     })
 
     const totalAmount = computed(() => periodData.value.total)
@@ -109,7 +122,11 @@ export default {
 
     const categoryRows = computed(() =>
       CATEGORIES
-        .map(c => ({ ...c, amount: periodData.value.catTotals[c.id] || 0 }))
+        .map(c => ({
+          ...c,
+          amount: periodData.value.catTotals[c.id] || 0,
+          txs:    periodData.value.catTxs[c.id]    || [],
+        }))
         .filter(c => c.amount > 0)
         .sort((a, b) => b.amount - a.amount)
         .map(c => ({ ...c, pct: totalAmount.value > 0 ? (c.amount / totalAmount.value) * 100 : 0 }))
@@ -154,9 +171,16 @@ export default {
 
     const fmt = n => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
+    // ── Category accordion ────────────────────────────────
+    const expandedCats = ref({})
+    function toggleCat(id) {
+      expandedCats.value = { ...expandedCats.value, [id]: !expandedCats.value[id] }
+    }
+
     return {
       mode, monthLabel, canGoNext, prevMonth, nextMonth,
       totalAmount, dailyAverage, categoryRows, potBalances, fmt,
+      expandedCats, toggleCat, fmtDate,
     }
   },
 
@@ -205,12 +229,24 @@ export default {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" v-html="cat.icon" />
           </div>
           <div class="stats-category-info">
-            <div class="stats-category-header">
+            <div class="stats-category-header" @click="toggleCat(cat.id)">
               <span class="stats-category-name">{{ cat.label }}</span>
-              <span class="stats-category-amount">{{ fmt(cat.amount) }}&thinsp;€</span>
+              <div class="stats-category-right">
+                <span class="stats-category-amount">{{ fmt(cat.amount) }}&thinsp;€</span>
+                <svg class="chevron" :class="{ open: expandedCats[cat.id] }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
             </div>
             <div class="bar-track">
               <div class="bar-fill" :style="{ width: cat.pct + '%', background: cat.color }" />
+            </div>
+            <div v-if="expandedCats[cat.id]" class="cat-tx-list">
+              <div class="cat-tx-item" v-for="item in cat.txs" :key="item.tx.id">
+                <span class="cat-tx-date">{{ fmtDate(item.tx.spending_date) }}</span>
+                <span class="cat-tx-title">{{ item.tx.title }}</span>
+                <span class="cat-tx-amount">{{ fmt(item.periodAmount) }}&thinsp;€</span>
+              </div>
             </div>
           </div>
         </div>

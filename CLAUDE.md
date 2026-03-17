@@ -53,6 +53,10 @@
 - **Andere Person hat bezahlt**: stores my share in `amount`, `from_pot = 'splitwise'`, no secondary fields. Same notes prefix.
 - Editing a transaction with `secondary_pot === 'splitwise'` re-opens the Splitwise tab.
 
+## Working style
+
+- **Ask before assuming** — when a feature request is ambiguous (e.g. a term like "Einkauf" could refer to a category or a pot), ask for clarification rather than guessing.
+
 ## Conventions
 
 - All UI text is **German**
