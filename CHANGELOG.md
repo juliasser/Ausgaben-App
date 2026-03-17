@@ -1,10 +1,42 @@
 # Changelog
 
-Phases in reverse order (newest first).
+Versions in reverse order (newest first).
 
 ---
 
-## Phase 9
+## v0.11
+
+### Bug fixes & new features
+
+**Bug fixes**
+
+- Splitwise: editing a transaction no longer duplicates the `Gesamt: …` note prefix
+- Statistics: current-month daily average now divides by elapsed days, not the full month length
+- iOS: disabled double-tap-to-zoom via `touch-action: manipulation` on `body`
+
+**New features**
+
+- **Geschenke** category added (purple, gift icon)
+- Splitwise tab now defaults `category` to *Einkauf* when opening a new transaction
+- Statistics: category rows are now expandable — tap to see individual transactions with date, title, and their period contribution
+- Transaction list: new *Verteilt* filter chip to show only distributed (multi-day) transactions
+- Add/Edit form: *Dieser Monat* button in the Erweitert section fills the consumption range with the first and last day of the current month
+
+---
+
+## v0.10
+
+### Post-launch improvements
+
+- **Schulden pot** added to the default pot list
+- **Initial balances** — settings screen now has a section to enter a starting balance for each pot, which is factored into the all-time saldo calculation
+- **Statistics: Salden** section added showing all-time pot balances
+- **Splitwise badge** on the navigation bar shows the current Splitwise pot balance at a glance
+- **Collapsible filter panel** in the transaction list (pot chips + date range); the filter icon highlights when a filter is active; a summary line shows entry count and total
+
+---
+
+## v0.9
 
 ### Data Backup & Export
 
@@ -23,7 +55,7 @@ Deferred: JSON import to restore from a backup file.
 
 ---
 
-## Phase 8
+## v0.8
 
 ### Split Payments & Splitwise
 
@@ -85,11 +117,11 @@ The app computes and stores `amount`, `from_pot`, `secondary_pot`, and `secondar
 
 #### Design evolution
 
-The original design explored signed amounts and a broader "secondary pot for any two-pot split" concept (e.g. 4 € Cash + 2 € Card for a 6 € purchase). The final design simplified to: `amount` = what left the primary pot, `secondary_amount` = the portion going to the secondary pot (always positive). The general two-pot split was left for a future phase if needed.
+The original design explored signed amounts and a broader "secondary pot for any two-pot split" concept (e.g. 4 € Cash + 2 € Card for a 6 € purchase). The final design simplified to: `amount` = what left the primary pot, `secondary_amount` = the portion going to the secondary pot (always positive). The general two-pot split was left for a future version if needed.
 
 ---
 
-## Phase 7
+## v0.7
 
 ### Supabase Backend
 
@@ -104,7 +136,7 @@ Replaced the localStorage data layer with a Supabase REST API backend.
 
 ---
 
-## Phase 6
+## v0.6
 
 ### PWA Polish
 
@@ -115,7 +147,7 @@ Replaced the localStorage data layer with a Supabase REST API backend.
 
 ---
 
-## Phase 5
+## v0.5
 
 ### Statistics
 
@@ -132,7 +164,7 @@ Display:
 
 ---
 
-## Phase 4
+## v0.4
 
 ### Transaction List
 
@@ -143,7 +175,7 @@ Display:
 
 ---
 
-## Phase 3
+## v0.3
 
 ### Add / Edit Screen
 
@@ -157,7 +189,7 @@ Display:
 
 ---
 
-## Phase 2
+## v0.2
 
 ### Data Layer
 
@@ -169,7 +201,7 @@ Budget pots confirmed: Bar, Karte, Splitwise, Paypal, Granada Karte.
 
 ---
 
-## Phase 1
+## v0.1
 
 ### Foundation
 
