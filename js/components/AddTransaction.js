@@ -85,7 +85,9 @@ export default {
       spending_date.value = t.spending_date
       from_pot.value      = t.from_pot
       category.value      = t.category || ''
-      notes.value         = t.notes || ''
+      const rawNotes = t.notes || ''
+      const gestamtMatch = rawNotes.match(/^Gesamt: [\d.,]+\u202f€\n?/)
+      notes.value = gestamtMatch ? rawNotes.slice(gestamtMatch[0].length) : rawNotes
 
       const hasRange = t.consumption_from !== t.spending_date || t.consumption_to
       if (hasRange) {

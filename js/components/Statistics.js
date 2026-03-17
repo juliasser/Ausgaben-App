@@ -94,8 +94,18 @@ export default {
       return { total, catTotals }
     })
 
-    const totalAmount  = computed(() => periodData.value.total)
-    const dailyAverage = computed(() => totalAmount.value / dateRange.value.days)
+    const totalAmount = computed(() => periodData.value.total)
+
+    const avgDays = computed(() => {
+      if (mode.value === '30days') return 30
+      const n = new Date()
+      if (selectedYear.value === n.getFullYear() && selectedMonth.value === n.getMonth() + 1) {
+        return n.getDate()
+      }
+      return dateRange.value.days
+    })
+
+    const dailyAverage = computed(() => totalAmount.value / avgDays.value)
 
     const categoryRows = computed(() =>
       CATEGORIES
