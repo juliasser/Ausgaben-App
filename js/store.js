@@ -85,3 +85,21 @@ export function deletePot(id) {
 export function resetPots() {
   localStorage.removeItem(POTS_KEY)
 }
+
+// ── Initial pot balances ──────────────────────────────────
+
+const INITIAL_BALANCES_KEY = 'ausgaben_initial_balances'
+
+/** Returns initial balance for every current pot, defaulting to 0 */
+export function getInitialBalances() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(INITIAL_BALANCES_KEY)) || {}
+    return Object.fromEntries(getPots().map(p => [p.id, stored[p.id] ?? 0]))
+  } catch {
+    return Object.fromEntries(getPots().map(p => [p.id, 0]))
+  }
+}
+
+export function saveInitialBalances(balances) {
+  localStorage.setItem(INITIAL_BALANCES_KEY, JSON.stringify(balances))
+}

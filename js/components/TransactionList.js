@@ -66,12 +66,21 @@ export default {
 
     const fmt = n => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
+    // Returns net Splitwise effect for a tx, or null if it doesn't touch Splitwise
+    function swEffect(tx) {
+      let effect = 0, touches = false
+      if (tx.from_pot === 'splitwise')                                          { effect -= tx.amount;           touches = true }
+      if (tx.to_pot   === 'splitwise')                                          { effect += tx.amount;           touches = true }
+      if (tx.secondary_pot === 'splitwise' && tx.secondary_amount != null)      { effect += tx.secondary_amount; touches = true }
+      return touches ? effect : null
+    }
+
     const showFilters = ref(false)
 
     return {
       pots, groupedList, dayTotal, potLabel, categoryMeta, headerDate,
       activePot, dateFrom, dateTo, anyFilter, filteredSum, visible, fmt,
-      showFilters,
+      showFilters, swEffect,
       handleEdit: tx => emit('edit', tx),
     }
   },
@@ -153,7 +162,7 @@ export default {
           <div class="tx-body">
             <span class="tx-title">{{ tx.title }}</span>
             <span class="tx-meta">
-              <span v-if="tx.category">{{ categoryMeta(tx.category).label }} &middot; </span>{{ potLabel(tx.from_pot) }}<span v-if="tx.consumption_to"> &middot; ⏱</span>
+              <span v-if="tx.category">{{ categoryMeta(tx.category).label }} &middot; </span>{{ potLabel(tx.from_pot) }}<span v-if="tx.consumption_to"> &middot; ⏱</span><template v-if="swEffect(tx) !== null"> &middot; <span class="sw-tag"><span class="sw-tag-icon">S</span><span :class="swEffect(tx) >= 0 ? 'sw-tag--pos' : 'sw-tag--neg'">{{ swEffect(tx) > 0 ? '+' : '' }}{{ fmt(swEffect(tx)) }}</span></span></template>
             </span>
           </div>
 

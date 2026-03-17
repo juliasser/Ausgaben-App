@@ -1,5 +1,6 @@
 import { computed, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 import { CATEGORIES, BUDGET_POTS } from '../config.js'
+import { getInitialBalances } from '../store.js'
 
 // ── Date utilities ────────────────────────────────────────
 
@@ -126,7 +127,8 @@ export default {
 
     // ── Pot balances (all-time) ────────────────────────────
     const potBalances = computed(() => {
-      const bal = Object.fromEntries(BUDGET_POTS.map(p => [p.id, 0]))
+      const initial = getInitialBalances()
+      const bal = Object.fromEntries(BUDGET_POTS.map(p => [p.id, initial[p.id] || 0]))
       for (const tx of allTransactions.value) {
         if (tx.type === 'expense') {
           bal[tx.from_pot] -= tx.amount

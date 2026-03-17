@@ -1,5 +1,6 @@
-import { ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+import { ref, watch } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 import { getCredentials, saveCredentials, testConnection } from '../db.js'
+import { getPots, getInitialBalances, saveInitialBalances } from '../store.js'
 
 export default {
   emits: ['saved'],
@@ -32,6 +33,11 @@ export default {
       saveCredentials(url.value, key.value)
       emit('saved')
     }
+
+    // ── Initial balances ──────────────────────────────────
+    const pots            = getPots()
+    const initialBalances = ref(getInitialBalances())
+    watch(initialBalances, val => saveInitialBalances(val), { deep: true })
 
     // ── Export ────────────────────────────────────────────
     const hasBackup = !!localStorage.getItem('ausgaben_backup')
@@ -74,7 +80,9 @@ export default {
       URL.revokeObjectURL(a.href)
     }
 
-    return { url, key, testing, testStatus, testMsg, test, save, hasBackup, downloadCSV, downloadJSON }
+    return { url, key, testing, testStatus, testMsg, test, save,
+             pots, initialBalances,
+             hasBackup, downloadCSV, downloadJSON }
   },
 
   template: `
@@ -116,6 +124,17 @@ export default {
           <svg v-if="testStatus === 'success'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
           <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           <span>{{ testMsg }}</span>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h2>Anfangssalden</h2>
+        <div class="initial-balance-row" v-for="p in pots" :key="p.id">
+          <span class="initial-balance-label">{{ p.label }}</span>
+          <div class="initial-balance-input">
+            <input type="number" v-model.number="initialBalances[p.id]" step="0.01" inputmode="decimal" placeholder="0" />
+            <span>€</span>
+          </div>
         </div>
       </div>
 

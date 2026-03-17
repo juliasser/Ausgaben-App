@@ -4,6 +4,7 @@ export const BUDGET_POTS = [
   { id: 'splitwise',  label: 'Splitwise' },
   { id: 'paypal',     label: 'Paypal' },
   { id: 'granada',    label: 'Granada Karte' },
+  { id: 'schulden',   label: 'Schulden' },
 ]
 
 export const CATEGORIES = [
