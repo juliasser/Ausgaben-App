@@ -19,6 +19,7 @@ Versions in reverse order (newest first).
 - 🦋 Statistics: tapping anywhere on a category row (including the icon) expands/collapses the accordion
 - 🦋 Einkauf category icon changed to a shopping cart
 - 🦋 Transaction list: pot balance effect (±amount) now works for every pot and is shown next to a transaction whenever the respective pot filter is active (replaces the Splitwise-only badge)
+- 🦋 Statistics (Monat mode): year bar chart showing consumption-based totals per month; tapping a bar navigates to that month; selected month is highlighted; future months with distributed expenses are shown and navigable; empty future months are dimmed
 
 <br/>
 

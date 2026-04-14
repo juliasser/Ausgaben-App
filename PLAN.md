@@ -15,7 +15,7 @@
 | [v0.9](CHANGELOG.md#v09) | localStorage backup after every fetch; CSV + JSON export in settings |
 | [v0.10](CHANGELOG.md#v010) | Schulden pot, initial balances, saldo in statistics, Splitwise badge, collapsible filter panel |
 | [v0.11](CHANGELOG.md#v011) | Bug fixes (note duplication, monthly average, double-tap zoom); Geschenke category, category accordion, distributed filter, Dieser Monat button, Einkauf default |
-| [v0.12](CHANGELOG.md#v012) | Bug fixes (icon alignment, persistent filters, Splitwise "andere" pre-fill); shopping cart icon, whole-row tap in stats, per-pot balance tag |
+| [v0.12](CHANGELOG.md#v012) | Bug fixes (icon alignment, persistent filters, Splitwise "andere" pre-fill); shopping cart icon, whole-row tap in stats, per-pot balance tag, year bar chart in statistics |
 
 <br/>
 

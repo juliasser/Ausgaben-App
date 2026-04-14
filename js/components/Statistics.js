@@ -32,7 +32,8 @@ function overlapDays(aFrom, aTo, bFrom, bTo) {
   return start > end ? 0 : spanDays(start, end)
 }
 
-const MONTH_FMT  = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' })
+const MONTH_FMT   = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' })
+const MONTH_SHORT = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez']
 const DATE_SHORT = new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'short' })
 
 function fmtDate(iso) {
@@ -149,7 +150,15 @@ export default {
 
     const canGoNext = computed(() => {
       const n = new Date()
-      return !(selectedYear.value === n.getFullYear() && selectedMonth.value === n.getMonth() + 1)
+      // Always allow going back to past or current month
+      if (selectedYear.value < n.getFullYear()) return true
+      if (selectedYear.value === n.getFullYear() && selectedMonth.value < n.getMonth() + 1) return true
+      // Beyond current month: only allow if a transaction has consumption extending further
+      return allTransactions.value.some(tx => {
+        if (!tx.consumption_to) return false
+        const [toY, toM] = tx.consumption_to.split('-').map(Number)
+        return toY > selectedYear.value || (toY === selectedYear.value && toM > selectedMonth.value)
+      })
     })
 
     // ── Pot balances (all-time) ────────────────────────────
@@ -177,10 +186,54 @@ export default {
       expandedCats.value = { ...expandedCats.value, [id]: !expandedCats.value[id] }
     }
 
+    // ── Year bar chart ────────────────────────────────────
+    const yearBars = computed(() => {
+      const y   = selectedYear.value
+      const now = new Date()
+      const monthTotals = new Array(12).fill(0)
+
+      for (const tx of allTransactions.value) {
+        if (tx.type !== 'expense') continue
+        const from    = tx.consumption_from || tx.spending_date
+        const to      = tx.consumption_to   || from
+        const consumed = tx.amount - (tx.secondary_amount ?? 0)
+        const txDays  = spanDays(from, to)
+
+        for (let m = 1; m <= 12; m++) {
+          const mStart = `${y}-${String(m).padStart(2, '0')}-01`
+          const mDays  = new Date(y, m, 0).getDate()
+          const mEnd   = `${y}-${String(m).padStart(2, '0')}-${String(mDays).padStart(2, '0')}`
+          const overlap = overlapDays(from, to, mStart, mEnd)
+          if (overlap > 0) monthTotals[m - 1] += (consumed / txDays) * overlap
+        }
+      }
+
+      const max = Math.max(...monthTotals, 1)
+
+      return monthTotals.map((total, i) => {
+        const month    = i + 1
+        const pastOrNow = y < now.getFullYear() ||
+          (y === now.getFullYear() && month <= now.getMonth() + 1)
+        return {
+          month,
+          total,
+          pct:        (total / max) * 100,
+          label:      MONTH_SHORT[i],
+          isSelected: selectedMonth.value === month,
+          isFuture:   !pastOrNow && total === 0,  // only dim if future AND empty
+        }
+      })
+    })
+
+    function selectBarMonth(bar) {
+      if (!bar.isFuture) selectedMonth.value = bar.month
+    }
+
     return {
       mode, monthLabel, canGoNext, prevMonth, nextMonth,
       totalAmount, dailyAverage, categoryRows, potBalances, fmt,
       expandedCats, toggleCat, fmtDate,
+      yearBars, selectBarMonth,
     }
   },
 
@@ -207,6 +260,28 @@ export default {
             <polyline points="9 18 15 12 9 6"/>
           </svg>
         </button>
+      </div>
+
+      <!-- Year bar chart (month mode only) -->
+      <div class="month-chart" v-if="mode === 'month'">
+        <div class="month-chart-bars">
+          <div
+            v-for="bar in yearBars"
+            :key="bar.month"
+            class="month-chart-bar"
+            :class="{ active: bar.isSelected, future: bar.isFuture }"
+            :style="{ height: bar.pct + '%' }"
+            @click="selectBarMonth(bar)"
+          ></div>
+        </div>
+        <div class="month-chart-labels">
+          <span
+            v-for="bar in yearBars"
+            :key="bar.month"
+            class="month-chart-label"
+            :class="{ active: bar.isSelected }"
+          >{{ bar.label }}</span>
+        </div>
       </div>
 
       <!-- Summary cards -->
