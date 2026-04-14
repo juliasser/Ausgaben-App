@@ -26,6 +26,21 @@
 - [ ] Apply consistent design system
 - [ ] Replace SVG placeholder icon
 
+### Shared expenses (replacing Splitwise)
+
+Replace the external Splitwise dependency with a built-in two-user shared ledger. No authentication — both users share the same Supabase project and identify themselves by a name set once in settings.
+
+**DB migration**
+- [ ] Add `user_id TEXT` column to transactions
+- [ ] Add `linked_tx_id UUID NULL` to pair mirrored transactions
+
+**App changes**
+- [ ] Settings: add "Mein Name" field (stored in localStorage alongside credentials)
+- [ ] Settings: add roommate name field (needed to tag mirrored transactions)
+- [ ] `db.js`: tag every new transaction with `user_id` on save
+- [ ] `AddTransaction.js`: when saving a splitwise "ich hat bezahlt" expense, auto-create a mirrored `from_pot=splitwise` transaction tagged with the roommate's `user_id`
+- [ ] `AddTransaction.js`: when editing/deleting a splitwise expense with a `linked_tx_id`, also update/delete the mirror
+- [ ] `TransactionList.js`: show a small "from [name]" badge on transactions created by the roommate
+
 ### Deferred
 - [ ] JSON import (restore from backup file)
-- [ ] Splitwise API OAuth sync as pre-fill helper
