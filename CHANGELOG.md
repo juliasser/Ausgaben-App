@@ -4,6 +4,24 @@ Versions in reverse order (newest first).
 
 <br/>
 
+## v0.12
+
+### Bug fixes & new features
+
+**Bug fixes**
+
+- 🐛 Statistics: category icon no longer shifts down when the accordion expands (`align-items: flex-start` on the row)
+- 🐛 Transaction list: filters now persist when navigating to Add/Edit and back (filter state moved to module level)
+- 🐛 Splitwise "andere Person hat bezahlt": editing a transaction now correctly restores the full Gesamtbetrag parsed from the note prefix
+
+**New features**
+
+- 🦋 Statistics: tapping anywhere on a category row (including the icon) expands/collapses the accordion
+- 🦋 Einkauf category icon changed to a shopping cart
+- 🦋 Transaction list: pot balance effect (±amount) now works for every pot and is shown next to a transaction whenever the respective pot filter is active (replaces the Splitwise-only badge)
+
+<br/>
+
 ## v0.11
 
 ### Bug fixes & new features

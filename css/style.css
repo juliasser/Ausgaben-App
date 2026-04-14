@@ -953,8 +953,15 @@ body {
 
 .stats-category-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.75rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.stats-category-row .tx-indicator {
+  margin-top: 2px;
+  flex-shrink: 0;
 }
 
 .stats-category-info {
@@ -969,8 +976,6 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .stats-category-right {

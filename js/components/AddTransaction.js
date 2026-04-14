@@ -92,7 +92,7 @@ export default {
       from_pot.value      = t.from_pot
       category.value      = t.category || ''
       const rawNotes = t.notes || ''
-      const gestamtMatch = rawNotes.match(/^Gesamt: [\d.,]+\u202f€\n?/)
+      const gestamtMatch = rawNotes.match(/^Gesamt: ([\d.,]+)\u202f€\n?/)
       notes.value = gestamtMatch ? rawNotes.slice(gestamtMatch[0].length) : rawNotes
 
       const hasRange = t.consumption_from !== t.spending_date || t.consumption_to
@@ -104,11 +104,17 @@ export default {
       }
 
       if (t.secondary_pot === 'splitwise' && t.secondary_amount != null) {
-        // Splitwise — I paid, other owes me
+        // Splitwise — Ich hat bezahlt
         uiType.value         = 'splitwise'
         swPaidBy.value       = 'ich'
         swTotalAmount.value  = String(t.amount)
         swMyShareEur.value   = String(t.amount - t.secondary_amount)
+      } else if (t.from_pot === 'splitwise' && gestamtMatch) {
+        // Splitwise — Andere Person hat bezahlt
+        uiType.value        = 'splitwise'
+        swPaidBy.value      = 'andere'
+        swTotalAmount.value = gestamtMatch[1].replace(',', '.')
+        swMyShareEur.value  = String(t.amount)
       } else if (t.type === 'transfer') {
         uiType.value   = 'transfer'
         amount.value   = String(t.amount)

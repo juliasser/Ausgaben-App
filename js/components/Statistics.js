@@ -224,12 +224,12 @@ export default {
       <!-- Category breakdown -->
       <div class="category-breakdown" v-if="categoryRows.length > 0">
         <h2>Nach Kategorie</h2>
-        <div class="stats-category-row" v-for="cat in categoryRows" :key="cat.id">
+        <div class="stats-category-row" v-for="cat in categoryRows" :key="cat.id" @click="toggleCat(cat.id)">
           <div class="tx-indicator" :style="{ background: cat.bg, color: cat.color }">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" v-html="cat.icon" />
           </div>
           <div class="stats-category-info">
-            <div class="stats-category-header" @click="toggleCat(cat.id)">
+            <div class="stats-category-header">
               <span class="stats-category-name">{{ cat.label }}</span>
               <div class="stats-category-right">
                 <span class="stats-category-amount">{{ fmt(cat.amount) }}&thinsp;€</span>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ausgaben-v10'
+const CACHE_NAME = 'ausgaben-v11'
 
 const APP_SHELL = [
   './',

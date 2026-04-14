@@ -13,6 +13,13 @@ function categoryMeta(id) {
   return CATEGORIES.find(c => c.id === id) ?? TRANSFER_META
 }
 
+// ── Persistent filter state (module-level — survives screen switches) ─────
+const activePot       = ref(null)
+const dateFrom        = ref('')
+const dateTo          = ref('')
+const showDistributed = ref(false)
+const showFilters     = ref(false)
+
 export default {
   props: {
     transactions: { type: Array, default: () => [] },
@@ -23,12 +30,6 @@ export default {
   setup(props, { emit }) {
     const pots     = getPots()
     const potLabel = id => pots.find(p => p.id === id)?.label ?? id
-
-    // ── Filters ───────────────────────────────────────────
-    const activePot       = ref(null)   // pot id | null
-    const dateFrom        = ref('')
-    const dateTo          = ref('')
-    const showDistributed = ref(false)
 
     const visible = computed(() =>
       props.transactions.filter(tx => {
@@ -68,21 +69,19 @@ export default {
 
     const fmt = n => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
-    // Returns net Splitwise effect for a tx, or null if it doesn't touch Splitwise
-    function swEffect(tx) {
+    // Returns net effect of a transaction on a given pot, or null if unrelated
+    function potEffect(tx, potId) {
       let effect = 0, touches = false
-      if (tx.from_pot === 'splitwise')                                          { effect -= tx.amount;           touches = true }
-      if (tx.to_pot   === 'splitwise')                                          { effect += tx.amount;           touches = true }
-      if (tx.secondary_pot === 'splitwise' && tx.secondary_amount != null)      { effect += tx.secondary_amount; touches = true }
+      if (tx.from_pot === potId)                                        { effect -= tx.amount;           touches = true }
+      if (tx.to_pot   === potId)                                        { effect += tx.amount;           touches = true }
+      if (tx.secondary_pot === potId && tx.secondary_amount != null)    { effect += tx.secondary_amount; touches = true }
       return touches ? effect : null
     }
-
-    const showFilters = ref(false)
 
     return {
       pots, groupedList, dayTotal, potLabel, categoryMeta, headerDate,
       activePot, dateFrom, dateTo, showDistributed, anyFilter, filteredSum, visible, fmt,
-      showFilters, swEffect,
+      showFilters, potEffect,
       handleEdit: tx => emit('edit', tx),
     }
   },
@@ -169,7 +168,7 @@ export default {
           <div class="tx-body">
             <span class="tx-title">{{ tx.title }}</span>
             <span class="tx-meta">
-              <span v-if="tx.category">{{ categoryMeta(tx.category).label }} &middot; </span>{{ potLabel(tx.from_pot) }}<span v-if="tx.consumption_to"> &middot; ⏱</span><template v-if="swEffect(tx) !== null"> &middot; <span class="sw-tag"><span class="sw-tag-icon">S</span><span :class="swEffect(tx) >= 0 ? 'sw-tag--pos' : 'sw-tag--neg'">{{ swEffect(tx) > 0 ? '+' : '' }}{{ fmt(swEffect(tx)) }}</span></span></template>
+              <span v-if="tx.category">{{ categoryMeta(tx.category).label }} &middot; </span>{{ potLabel(tx.from_pot) }}<span v-if="tx.consumption_to"> &middot; ⏱</span><template v-if="activePot && potEffect(tx, activePot) !== null"> &middot; <span class="sw-tag"><span :class="potEffect(tx, activePot) >= 0 ? 'sw-tag--pos' : 'sw-tag--neg'">{{ potEffect(tx, activePot) > 0 ? '+' : '' }}{{ fmt(potEffect(tx, activePot)) }}</span></span></template>
             </span>
           </div>
 
