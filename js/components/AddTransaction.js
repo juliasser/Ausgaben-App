@@ -181,7 +181,7 @@ export default {
           e.from_pot = 'Zahlungsmittel erforderlich'
       } else {
         const amt = parseFloat(amount.value)
-        if (!amount.value || isNaN(amt) || amt <= 0) e.amount = 'Bitte einen gültigen Betrag eingeben'
+        if (!amount.value || isNaN(amt) || amt === 0) e.amount = 'Bitte einen gültigen Betrag eingeben'
         if (!spending_date.value)                    e.spending_date = 'Datum erforderlich'
         if (!from_pot.value)                         e.from_pot = 'Budget-Topf erforderlich'
 
@@ -351,7 +351,6 @@ export default {
               type="number"
               v-model="amount"
               inputmode="decimal"
-              min="0"
               step="0.01"
               placeholder="0"
             />

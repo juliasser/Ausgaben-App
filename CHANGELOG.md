@@ -20,6 +20,7 @@ Versions in reverse order (newest first).
 - 🦋 Einkauf category icon changed to a shopping cart
 - 🦋 Transaction list: pot balance effect (±amount) now works for every pot and is shown next to a transaction whenever the respective pot filter is active (replaces the Splitwise-only badge)
 - 🦋 Statistics (Monat mode): year bar chart showing consumption-based totals per month; tapping a bar navigates to that month; selected month is highlighted; future months with distributed expenses are shown and navigable; empty future months are dimmed
+- 🦋 Negative amounts allowed for expenses (e.g. refunds); requires dropping the `transactions_amount_check` DB constraint
 
 <br/>
 
