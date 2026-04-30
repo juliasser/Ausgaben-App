@@ -644,6 +644,48 @@ body {
   font-size: 0.95rem;
 }
 
+/* ── Search bar ──────────────────────────────────────────── */
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 0 0.75rem;
+}
+
+.search-icon {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: var(--text);
+  padding: 0.6rem 0;
+  -webkit-appearance: none;
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.search-clear {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+
 /* ── List filters ────────────────────────────────────────── */
 
 .filter-panel {

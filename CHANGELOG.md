@@ -4,6 +4,15 @@ Versions in reverse order (newest first).
 
 <br/>
 
+## v0.13
+
+### New features
+
+- 🦋 Transaction list: text search in filter panel (searches title and notes)
+- 🦋 Transaction list: category filter chips in filter panel (multi-select, each chip uses its category colour)
+
+<br/>
+
 ## v0.12
 
 ### Bug fixes & new features

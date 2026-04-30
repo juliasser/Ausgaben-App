@@ -14,11 +14,13 @@ function categoryMeta(id) {
 }
 
 // ── Persistent filter state (module-level — survives screen switches) ─────
-const activePot       = ref(null)
-const dateFrom        = ref('')
-const dateTo          = ref('')
-const showDistributed = ref(false)
-const showFilters     = ref(false)
+const activePot         = ref(null)
+const activeCategories  = ref([])
+const dateFrom          = ref('')
+const dateTo            = ref('')
+const showDistributed   = ref(false)
+const showFilters       = ref(false)
+const searchText        = ref('')
 
 export default {
   props: {
@@ -31,8 +33,9 @@ export default {
     const pots     = getPots()
     const potLabel = id => pots.find(p => p.id === id)?.label ?? id
 
-    const visible = computed(() =>
-      props.transactions.filter(tx => {
+    const visible = computed(() => {
+      const q = searchText.value.trim().toLowerCase()
+      return props.transactions.filter(tx => {
         if (activePot.value) {
           const p = activePot.value
           if (tx.from_pot !== p && tx.to_pot !== p && tx.secondary_pot !== p) return false
@@ -40,11 +43,13 @@ export default {
         if (dateFrom.value && tx.spending_date < dateFrom.value) return false
         if (dateTo.value   && tx.spending_date > dateTo.value)   return false
         if (showDistributed.value && !tx.consumption_to) return false
+        if (activeCategories.value.length && !activeCategories.value.includes(tx.category)) return false
+        if (q && !(tx.title?.toLowerCase().includes(q) || tx.notes?.toLowerCase().includes(q))) return false
         return true
       })
-    )
+    })
 
-    const anyFilter = computed(() => activePot.value || dateFrom.value || dateTo.value || showDistributed.value)
+    const anyFilter = computed(() => activePot.value || activeCategories.value.length || dateFrom.value || dateTo.value || showDistributed.value || searchText.value.trim())
 
     // Sum of consumed expenses in the visible set
     const filteredSum = computed(() =>
@@ -78,10 +83,18 @@ export default {
       return touches ? effect : null
     }
 
+    const toggleCategory = id => {
+      const i = activeCategories.value.indexOf(id)
+      if (i === -1) activeCategories.value.push(id)
+      else activeCategories.value.splice(i, 1)
+    }
+
     return {
       pots, groupedList, dayTotal, potLabel, categoryMeta, headerDate,
-      activePot, dateFrom, dateTo, showDistributed, anyFilter, filteredSum, visible, fmt,
-      showFilters, potEffect,
+      activePot, activeCategories, toggleCategory, dateFrom, dateTo, showDistributed,
+      anyFilter, filteredSum, visible, fmt,
+      showFilters, potEffect, searchText,
+      CATEGORIES,
       handleEdit: tx => emit('edit', tx),
     }
   },
@@ -107,6 +120,18 @@ export default {
 
       <!-- Collapsible filter panel -->
       <div class="filter-panel" v-show="showFilters">
+        <div class="search-bar">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="search"
+            class="search-input"
+            placeholder="Suchen…"
+            v-model="searchText"
+          />
+          <button v-if="searchText" class="search-clear" @click="searchText = ''" aria-label="Suche löschen">×</button>
+        </div>
         <div class="filter-row">
           <button
             v-for="p in pots"
@@ -120,6 +145,16 @@ export default {
             :class="{ active: showDistributed }"
             @click="showDistributed = !showDistributed"
           >Verteilt</button>
+        </div>
+        <div class="filter-row">
+          <button
+            v-for="c in CATEGORIES"
+            :key="c.id"
+            class="filter-chip"
+            :class="{ active: activeCategories.includes(c.id) }"
+            :style="activeCategories.includes(c.id) ? { background: c.bg, color: c.color, borderColor: c.color } : {}"
+            @click="toggleCategory(c.id)"
+          >{{ c.label }}</button>
         </div>
         <div class="filter-dates">
           <div class="filter-date-group">
