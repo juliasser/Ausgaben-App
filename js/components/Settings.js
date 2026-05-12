@@ -3,7 +3,7 @@ import { getCredentials, saveCredentials, testConnection } from '../db.js'
 import { getPots, getInitialBalances, saveInitialBalances } from '../store.js'
 
 export default {
-  emits: ['saved'],
+  emits: ['saved', 'cancel'],
 
   setup(_, { emit }) {
     const creds = getCredentials()
@@ -87,7 +87,14 @@ export default {
 
   template: `
     <div class="settings">
-      <h1>Einstellungen</h1>
+      <div class="list-header">
+        <h1>Einstellungen</h1>
+        <button class="icon-btn" @click="$emit('cancel')" aria-label="Schließen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="22" height="22">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
 
       <div class="settings-section">
         <h2>Supabase</h2>

@@ -71,9 +71,10 @@ const App = {
           @cancel="editingTransaction = null; currentScreen = 'list'"
         />
         <TransactionList
-          v-else-if="currentScreen === 'list'"
+          v-else-if="currentScreen === 'list' || currentScreen === 'settings'"
           :transactions="transactions"
           :loading="loading"
+          :settingsActive="currentScreen === 'settings'"
           @edit="startEdit"
           @settings="currentScreen = 'settings'"
         />
@@ -81,10 +82,9 @@ const App = {
           v-else-if="currentScreen === 'stats'"
           :transactions="transactions"
         />
-        <Settings
-          v-else-if="currentScreen === 'settings'"
-          @saved="onSettingsSaved"
-        />
+        <div v-if="currentScreen === 'settings'" class="settings-overlay">
+          <Settings @saved="onSettingsSaved" @cancel="currentScreen = 'list'" />
+        </div>
       </main>
 
       <NavBar :current="currentScreen" @navigate="currentScreen = $event" />
