@@ -4,6 +4,21 @@ Versions in reverse order (newest first).
 
 <br/>
 
+## v0.14
+
+### Bug fixes
+
+- 🐛 Transaction list: Chrome search clear (×) button now hidden via CSS instead of breaking the layout
+- 🐛 Transaction list: filter and settings icon buttons now correctly show active state
+- 🐛 Settings: close button now works correctly
+
+### New features
+
+- 🦋 Statistics: week view with bar chart and month grouping
+- 🦋 Tags: free-form, user-defined tags on expenses and Splitwise transactions; tag input with autocomplete from existing tags and inline creation; multi-select tag filter (OR logic) in the list filter panel
+
+<br/>
+
 ## v0.13
 
 ### New features

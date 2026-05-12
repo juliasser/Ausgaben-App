@@ -788,6 +788,60 @@ body {
   color: var(--color-text);
 }
 
+.tag-chip--new {
+  border-style: dashed;
+}
+
+/* ── Tag editor (AddTransaction) ──────────────────────── */
+
+.tag-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tag-selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.375rem 0.25rem 0.625rem;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-primary);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.tag-pill__remove {
+  background: none;
+  border: none;
+  padding: 0 0.125rem;
+  cursor: pointer;
+  color: var(--color-primary);
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  opacity: 0.7;
+}
+
+.tag-pill__remove:hover {
+  opacity: 1;
+}
+
+.tag-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
 /* Date group */
 .date-group {
   display: flex;

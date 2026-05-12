@@ -1,4 +1,4 @@
-import { createApp, ref, onMounted } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+import { createApp, ref, computed, onMounted } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 import NavBar          from './components/NavBar.js'
 import AddTransaction  from './components/AddTransaction.js'
 import TransactionList from './components/TransactionList.js'
@@ -48,9 +48,17 @@ const App = {
       refresh()
     }
 
+    const allTags = computed(() => {
+      const set = new Set()
+      for (const tx of transactions.value) {
+        for (const tag of (tx.tags || [])) set.add(tag)
+      }
+      return [...set].sort()
+    })
+
     return {
       currentScreen, editingTransaction,
-      transactions, loading, loadError,
+      transactions, loading, loadError, allTags,
       startEdit, onSaved, onSettingsSaved,
     }
   },
@@ -67,6 +75,7 @@ const App = {
         <AddTransaction
           v-if="currentScreen === 'add'"
           :transaction="editingTransaction"
+          :allTags="allTags"
           @saved="onSaved"
           @cancel="editingTransaction = null; currentScreen = 'list'"
         />

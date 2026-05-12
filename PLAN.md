@@ -17,6 +17,7 @@
 | [v0.11](CHANGELOG.md#v011) | Bug fixes (note duplication, monthly average, double-tap zoom); Geschenke category, category accordion, distributed filter, Dieser Monat button, Einkauf default |
 | [v0.12](CHANGELOG.md#v012) | Bug fixes (icon alignment, persistent filters, Splitwise "andere" pre-fill); shopping cart icon, whole-row tap in stats, per-pot balance tag, year bar chart in statistics, negative amounts for refunds |
 | [v0.13](CHANGELOG.md#v013) | Text search and category filter chips in the list filter panel |
+| [v0.14](CHANGELOG.md#v014) | Bug fixes (Chrome search X, active states, settings close); statistics week view; free-form tags with autocomplete and filter |
 
 <br/>
 

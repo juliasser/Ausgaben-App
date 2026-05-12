@@ -13,6 +13,7 @@ function today() {
 export default {
   props: {
     transaction: { type: Object, default: null },
+    allTags:     { type: Array,  default: () => [] },
   },
   emits: ['saved', 'cancel'],
 
@@ -34,6 +35,36 @@ export default {
     const consumption_from          = ref(today())
     const consumption_to            = ref('')
     const consumptionFromUserEdited = ref(false)
+
+    // ── Tags ─────────────────────────────────────────────
+    const tags     = ref([])
+    const tagInput = ref('')
+
+    const tagSuggestions = computed(() => {
+      const q = tagInput.value.trim().toLowerCase()
+      return props.allTags
+        .filter(t => !tags.value.includes(t))
+        .filter(t => !q || t.toLowerCase().includes(q))
+    })
+
+    function addTag(tag) {
+      const t = tag.trim()
+      if (t && !tags.value.includes(t)) tags.value.push(t)
+      tagInput.value = ''
+    }
+
+    function removeTag(tag) {
+      tags.value = tags.value.filter(t => t !== tag)
+    }
+
+    function handleTagKeydown(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        const q = tagInput.value.trim()
+        if (!q) return
+        addTag(tagSuggestions.value[0] ?? q)
+      }
+    }
 
     // ── Splitwise state ───────────────────────────────────
     const swTotalAmount  = ref('')
@@ -91,6 +122,7 @@ export default {
       spending_date.value = t.spending_date
       from_pot.value      = t.from_pot
       category.value      = t.category || ''
+      tags.value = Array.isArray(t.tags) ? [...t.tags] : []
       const rawNotes = t.notes || ''
       const gestamtMatch = rawNotes.match(/^Gesamt: ([\d.,]+)\u202f€\n?/)
       notes.value = gestamtMatch ? rawNotes.slice(gestamtMatch[0].length) : rawNotes
@@ -239,6 +271,7 @@ export default {
               notes:            finalNotes,
               secondary_pot:    'splitwise',
               secondary_amount: total - myAmt,  // what the other person owes me
+              tags:             tags.value,
             }
           } else {
             // Andere Person hat gezahlt — I owe my share from Splitwise
@@ -255,6 +288,7 @@ export default {
               notes:            finalNotes,
               secondary_pot:    null,
               secondary_amount: null,
+              tags:             tags.value,
             }
           }
         } else {
@@ -273,6 +307,7 @@ export default {
             notes:            notes.value.trim(),
             secondary_pot:    null,
             secondary_amount: null,
+            ...(uiType.value === 'expense' ? { tags: tags.value } : {}),
           }
         }
 
@@ -309,6 +344,7 @@ export default {
       showConsumption, consumption_from, consumption_to, consumptionFromUserEdited,
       dayCount, dailyAmount,
       swTotalAmount, swPaidBy, swMyShareEur, swTheirShareAmount,
+      tags, tagInput, tagSuggestions, addTag, removeTag, handleTagKeydown,
       errors, saving, saveError, save, fmt2, setThisMonth,
       confirmingDelete, doDelete,
     }
@@ -373,6 +409,26 @@ export default {
             <option v-for="c in CATEGORIES" :key="c.id" :value="c.id">{{ c.label }}</option>
           </select>
           <span class="error" v-if="errors.category">{{ errors.category }}</span>
+        </div>
+
+        <!-- Tags (expense only) -->
+        <div class="form-group" v-if="uiType === 'expense'">
+          <label>Tags <span class="optional">(optional)</span></label>
+          <div class="tag-editor">
+            <div class="tag-selected" v-if="tags.length">
+              <span class="tag-pill" v-for="tag in tags" :key="tag">
+                {{ tag }}
+                <button type="button" class="tag-pill__remove" @click="removeTag(tag)" aria-label="Tag entfernen">&times;</button>
+              </span>
+            </div>
+            <input type="text" class="tag-input" v-model="tagInput" placeholder="Tag hinzufügen…" @keydown="handleTagKeydown" />
+            <div class="tag-suggestions" v-if="tagSuggestions.length || (tagInput.trim() && !tags.includes(tagInput.trim()))">
+              <button type="button" class="filter-chip" v-for="st in tagSuggestions" :key="st" @click="addTag(st)">{{ st }}</button>
+              <button type="button" class="filter-chip tag-chip--new"
+                v-if="tagInput.trim() && !tagSuggestions.some(s => s.toLowerCase() === tagInput.trim().toLowerCase()) && !tags.includes(tagInput.trim())"
+                @click="addTag(tagInput)">+ {{ tagInput.trim() }}</button>
+            </div>
+          </div>
         </div>
 
         <!-- From pot -->
@@ -518,6 +574,26 @@ export default {
             <option v-for="c in CATEGORIES" :key="c.id" :value="c.id">{{ c.label }}</option>
           </select>
           <span class="error" v-if="errors.category">{{ errors.category }}</span>
+        </div>
+
+        <!-- Tags (splitwise) -->
+        <div class="form-group">
+          <label>Tags <span class="optional">(optional)</span></label>
+          <div class="tag-editor">
+            <div class="tag-selected" v-if="tags.length">
+              <span class="tag-pill" v-for="tag in tags" :key="tag">
+                {{ tag }}
+                <button type="button" class="tag-pill__remove" @click="removeTag(tag)" aria-label="Tag entfernen">&times;</button>
+              </span>
+            </div>
+            <input type="text" class="tag-input" v-model="tagInput" placeholder="Tag hinzufügen…" @keydown="handleTagKeydown" />
+            <div class="tag-suggestions" v-if="tagSuggestions.length || (tagInput.trim() && !tags.includes(tagInput.trim()))">
+              <button type="button" class="filter-chip" v-for="st in tagSuggestions" :key="st" @click="addTag(st)">{{ st }}</button>
+              <button type="button" class="filter-chip tag-chip--new"
+                v-if="tagInput.trim() && !tagSuggestions.some(s => s.toLowerCase() === tagInput.trim().toLowerCase()) && !tags.includes(tagInput.trim())"
+                @click="addTag(tagInput)">+ {{ tagInput.trim() }}</button>
+            </div>
+          </div>
         </div>
 
         <!-- Datum -->

@@ -16,6 +16,7 @@ function categoryMeta(id) {
 // ── Persistent filter state (module-level — survives screen switches) ─────
 const activePot         = ref(null)
 const activeCategories  = ref([])
+const activeTags        = ref([])
 const dateFrom          = ref('')
 const dateTo            = ref('')
 const showDistributed   = ref(false)
@@ -45,12 +46,13 @@ export default {
         if (dateTo.value   && tx.spending_date > dateTo.value)   return false
         if (showDistributed.value && !tx.consumption_to) return false
         if (activeCategories.value.length && !activeCategories.value.includes(tx.category)) return false
+        if (activeTags.value.length && !activeTags.value.some(t => (tx.tags || []).includes(t))) return false
         if (q && !(tx.title?.toLowerCase().includes(q) || tx.notes?.toLowerCase().includes(q))) return false
         return true
       })
     })
 
-    const anyFilter = computed(() => activePot.value || activeCategories.value.length || dateFrom.value || dateTo.value || showDistributed.value || searchText.value.trim())
+    const anyFilter = computed(() => activePot.value || activeCategories.value.length || activeTags.value.length || dateFrom.value || dateTo.value || showDistributed.value || searchText.value.trim())
 
     // Sum of consumed expenses in the visible set
     const filteredSum = computed(() =>
@@ -84,15 +86,31 @@ export default {
       return touches ? effect : null
     }
 
+    const allTags = computed(() => {
+      const set = new Set()
+      for (const tx of props.transactions) {
+        for (const tag of (tx.tags || [])) set.add(tag)
+      }
+      return [...set].sort()
+    })
+
     const toggleCategory = id => {
       const i = activeCategories.value.indexOf(id)
       if (i === -1) activeCategories.value.push(id)
       else activeCategories.value.splice(i, 1)
     }
 
+    const toggleTag = tag => {
+      const i = activeTags.value.indexOf(tag)
+      if (i === -1) activeTags.value.push(tag)
+      else activeTags.value.splice(i, 1)
+    }
+
     return {
       pots, groupedList, dayTotal, potLabel, categoryMeta, headerDate,
-      activePot, activeCategories, toggleCategory, dateFrom, dateTo, showDistributed,
+      activePot, activeCategories, toggleCategory,
+      activeTags, allTags, toggleTag,
+      dateFrom, dateTo, showDistributed,
       anyFilter, filteredSum, visible, fmt,
       showFilters, potEffect, searchText,
       CATEGORIES,
@@ -156,6 +174,15 @@ export default {
             :style="activeCategories.includes(c.id) ? { background: c.bg, color: c.color, borderColor: c.color } : {}"
             @click="toggleCategory(c.id)"
           >{{ c.label }}</button>
+        </div>
+        <div class="filter-row" v-if="allTags.length">
+          <button
+            v-for="tag in allTags"
+            :key="tag"
+            class="filter-chip"
+            :class="{ active: activeTags.includes(tag) }"
+            @click="toggleTag(tag)"
+          ># {{ tag }}</button>
         </div>
         <div class="filter-dates">
           <div class="filter-date-group">
