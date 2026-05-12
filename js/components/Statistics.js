@@ -32,6 +32,14 @@ function overlapDays(aFrom, aTo, bFrom, bTo) {
   return start > end ? 0 : spanDays(start, end)
 }
 
+// Monday of the week containing the given ISO date
+function weekStart(iso) {
+  const d = dateFromIso(iso)
+  const day = d.getDay() // 0=Sun … 6=Sat
+  d.setDate(d.getDate() + (day === 0 ? -6 : 1 - day))
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 const MONTH_FMT   = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' })
 const MONTH_SHORT = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez']
 const DATE_SHORT = new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'short' })
@@ -48,11 +56,13 @@ export default {
     transactions: { type: Array, default: () => [] },
   },
   setup(props) {
-    const mode = ref('30days') // '30days' | 'month'
+    const mode = ref('30days') // '30days' | 'month' | 'week'
 
     const now = new Date()
-    const selectedYear  = ref(now.getFullYear())
-    const selectedMonth = ref(now.getMonth() + 1) // 1-12
+    const selectedYear      = ref(now.getFullYear())
+    const selectedMonth     = ref(now.getMonth() + 1) // 1-12
+    const selectedWeekStart = ref(weekStart(isoToday()))
+    const weekWindowEnd     = ref(weekStart(isoToday())) // rightmost bar in the chart
 
     // ── Date range for current mode ───────────────────────
     const dateRange = computed(() => {
@@ -60,6 +70,11 @@ export default {
         const end   = isoToday()
         const start = addDays(end, -29)
         return { start, end, days: 30 }
+      }
+      if (mode.value === 'week') {
+        const start = selectedWeekStart.value
+        const end   = addDays(start, 6)
+        return { start, end, days: 7 }
       }
       const y = selectedYear.value
       const m = selectedMonth.value
@@ -112,6 +127,13 @@ export default {
 
     const avgDays = computed(() => {
       if (mode.value === '30days') return 30
+      if (mode.value === 'week') {
+        const today   = isoToday()
+        const weekEnd = addDays(selectedWeekStart.value, 6)
+        if (selectedWeekStart.value > today) return 7   // future week: full 7 days
+        if (weekEnd > today) return spanDays(selectedWeekStart.value, today) // current week: elapsed days only
+        return 7
+      }
       const n = new Date()
       if (selectedYear.value === n.getFullYear() && selectedMonth.value === n.getMonth() + 1) {
         return n.getDate()
@@ -159,6 +181,87 @@ export default {
         const [toY, toM] = tx.consumption_to.split('-').map(Number)
         return toY > selectedYear.value || (toY === selectedYear.value && toM > selectedMonth.value)
       })
+    })
+
+    // ── Week navigation ───────────────────────────────────
+    function prevWeek() {
+      selectedWeekStart.value = addDays(selectedWeekStart.value, -7)
+      weekWindowEnd.value     = addDays(weekWindowEnd.value,     -7)
+    }
+    function nextWeek() {
+      selectedWeekStart.value = addDays(selectedWeekStart.value, 7)
+      weekWindowEnd.value     = addDays(weekWindowEnd.value,     7)
+    }
+
+    const weekLabel = computed(() => {
+      const start = selectedWeekStart.value
+      const end   = addDays(start, 6)
+      const s = dateFromIso(start)
+      const e = dateFromIso(end)
+      if (s.getMonth() === e.getMonth()) {
+        return `${s.getDate()}. – ${e.getDate()}. ${MONTH_SHORT[e.getMonth()]} ${e.getFullYear()}`
+      }
+      return `${s.getDate()}. ${MONTH_SHORT[s.getMonth()]} – ${e.getDate()}. ${MONTH_SHORT[e.getMonth()]} ${e.getFullYear()}`
+    })
+
+    const canGoNextWeek = computed(() => {
+      const today     = isoToday()
+      const nextStart = addDays(selectedWeekStart.value, 7)
+      if (nextStart <= today) return true
+      return allTransactions.value.some(tx => tx.consumption_to >= nextStart)
+    })
+
+    // ── Week bar chart (15-week window ending on weekWindowEnd) ──
+    const weekBars = computed(() => {
+      const today = isoToday()
+      const bars  = []
+      let wStart  = addDays(weekWindowEnd.value, -14 * 7)
+
+      for (let i = 0; i < 15; i++) {
+        const wEnd = addDays(wStart, 6)
+        let total = 0
+        for (const tx of allTransactions.value) {
+          if (tx.type !== 'expense') continue
+          const from     = tx.consumption_from || tx.spending_date
+          const to       = tx.consumption_to   || from
+          const consumed = tx.amount - (tx.secondary_amount ?? 0)
+          const overlap  = overlapDays(from, to, wStart, wEnd)
+          if (overlap > 0) total += (consumed / spanDays(from, to)) * overlap
+        }
+        const d = dateFromIso(wStart)
+        bars.push({
+          start:      wStart,
+          total,
+          isSelected: selectedWeekStart.value === wStart,
+          isCurrent:  wStart === weekStart(today),
+          isFuture:   wStart > today && total === 0,
+        })
+        wStart = addDays(wStart, 7)
+      }
+
+      const max = Math.max(...bars.map(b => b.total), 1)
+      return bars.map(b => ({ ...b, pct: (b.total / max) * 100 }))
+    })
+
+    function selectBarWeek(bar) {
+      if (!bar.isFuture) selectedWeekStart.value = bar.start
+      // window stays put — only the active week changes
+    }
+
+    const weekMonthGroups = computed(() => {
+      const groups = []
+      let col = 1
+      for (const bar of weekBars.value) {
+        const [y, m] = bar.start.split('-').map(Number)
+        const key = `${y}-${m}`
+        if (groups.length && groups[groups.length - 1].monthKey === key) {
+          groups[groups.length - 1].count++
+        } else {
+          groups.push({ monthKey: key, label: MONTH_SHORT[m - 1], count: 1, startCol: col })
+        }
+        col++
+      }
+      return groups
     })
 
     // ── Pot balances (all-time) ────────────────────────────
@@ -220,6 +323,7 @@ export default {
           pct:        (total / max) * 100,
           label:      MONTH_SHORT[i],
           isSelected: selectedMonth.value === month,
+          isCurrent:  y === now.getFullYear() && month === now.getMonth() + 1,
           isFuture:   !pastOrNow && total === 0,  // only dim if future AND empty
         }
       })
@@ -231,9 +335,11 @@ export default {
 
     return {
       mode, monthLabel, canGoNext, prevMonth, nextMonth,
+      weekLabel, canGoNextWeek, prevWeek, nextWeek,
       totalAmount, dailyAverage, categoryRows, potBalances, fmt,
       expandedCats, toggleCat, fmtDate,
       yearBars, selectBarMonth,
+      weekBars, selectBarWeek, weekMonthGroups,
     }
   },
 
@@ -244,7 +350,48 @@ export default {
       <!-- Mode toggle -->
       <div class="type-toggle">
         <button :class="{ active: mode === '30days' }" @click="mode = '30days'">30 Tage</button>
+        <button :class="{ active: mode === 'week' }"   @click="mode = 'week'">Woche</button>
         <button :class="{ active: mode === 'month' }"  @click="mode = 'month'">Monat</button>
+      </div>
+
+      <!-- Week navigator -->
+      <div class="month-nav" v-if="mode === 'week'">
+        <button class="month-nav-btn" @click="prevWeek">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <span class="month-nav-label">{{ weekLabel }}</span>
+        <button class="month-nav-btn" @click="nextWeek" :disabled="!canGoNextWeek">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Week bar chart -->
+      <div class="month-chart" v-if="mode === 'week'">
+        <div class="week-chart-grid">
+          <div
+            v-for="(bar, i) in weekBars"
+            :key="bar.start"
+            class="week-chart-bar-cell"
+            :style="{ gridColumn: i + 1 }"
+            @click="selectBarWeek(bar)"
+          >
+            <div
+              class="month-chart-bar"
+              :class="{ active: bar.isSelected, future: bar.isFuture, current: bar.isCurrent }"
+              :style="{ height: bar.pct + '%' }"
+            ></div>
+          </div>
+          <div
+            v-for="g in weekMonthGroups"
+            :key="g.monthKey"
+            class="week-month-label"
+            :style="{ gridColumn: g.startCol + ' / span ' + g.count }"
+          >{{ g.label }}</div>
+        </div>
       </div>
 
       <!-- Month navigator -->
@@ -269,7 +416,7 @@ export default {
             v-for="bar in yearBars"
             :key="bar.month"
             class="month-chart-bar"
-            :class="{ active: bar.isSelected, future: bar.isFuture }"
+            :class="{ active: bar.isSelected, future: bar.isFuture, current: bar.isCurrent }"
             :style="{ height: bar.pct + '%' }"
             @click="selectBarMonth(bar)"
           ></div>
@@ -279,7 +426,7 @@ export default {
             v-for="bar in yearBars"
             :key="bar.month"
             class="month-chart-label"
-            :class="{ active: bar.isSelected }"
+            :class="{ active: bar.isSelected, current: bar.isCurrent }"
           >{{ bar.label }}</span>
         </div>
       </div>
